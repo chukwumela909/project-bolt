@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { 
-  Mail, 
-  Lock, 
-  User, 
-  Phone, 
-  Globe, 
-  Shield, 
-  AlertCircle, 
+import {
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Globe,
+  Shield,
+  AlertCircle,
   CheckCircle2,
   Eye,
   EyeOff,
@@ -35,8 +35,8 @@ export function Auth() {
     score: 0,
     message: '',
   });
-  
-  const { signIn, signUp } = useAuthStore();
+
+  const { signIn, signUp, fetchUserData } = useAuthStore();
 
   const validatePassword = (password: string) => {
     let score = 0;
@@ -95,7 +95,7 @@ export function Auth() {
         setError('Passwords do not match');
         return false;
       }
-      
+
       if (!validatePassword(formData.password)) {
         setError('Password must be at least 8 characters long and include uppercase, numbers, and special characters');
         return false;
@@ -123,19 +123,24 @@ export function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     try {
       if (isLogin) {
         await signIn(formData.email, formData.password);
+      //  await fetchUserData();
         navigate('/dashboard');
       } else {
         await signUp(formData.email, formData.password, formData.fullName, formData.country, formData.phone);
+        navigate('/login');
+
         // After successful signup, automatically sign in
         await signIn(formData.email, formData.password);
+        // fetchUserData()
         navigate('/dashboard');
+
       }
     } catch (err) {
       setError((err as Error).message);
@@ -160,12 +165,12 @@ export function Auth() {
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </h2>
           <p className="text-slate-400">
-            {isLogin 
+            {isLogin
               ? 'Sign in to access your staking dashboard'
               : 'Join us and start your staking journey'}
           </p>
         </motion.div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <>
@@ -219,7 +224,7 @@ export function Auth() {
               </div>
             </>
           )}
-          
+
           <div>
             <label className="block text-sm font-medium mb-1">Email Address</label>
             <div className="relative">
@@ -235,7 +240,7 @@ export function Auth() {
               />
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1">Password</label>
             <div className="relative">
@@ -316,7 +321,7 @@ export function Auth() {
               <span>{error}</span>
             </div>
           )}
-          
+
           <motion.button
             type="submit"
             disabled={isLoading}
@@ -339,7 +344,7 @@ export function Auth() {
             )}
           </motion.button>
         </form>
-        
+
         <div className="mt-6 text-center">
           <button
             onClick={() => {
@@ -358,6 +363,16 @@ export function Auth() {
             className="text-blue-400 hover:text-blue-300 text-sm"
           >
             {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
+          </button>
+        </div>
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => {
+              navigate('/forgotPassword');
+            }}
+            className="text-blue-400 hover:text-blue-300 text-sm"
+          >
+            {'Forgot Password'}
           </button>
         </div>
       </motion.div>

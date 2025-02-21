@@ -11,6 +11,7 @@ import { Features } from './pages/Features';
 import { FAQ } from './pages/FAQ';
 import { Blog } from './pages/Blog';
 import { Admin } from './pages/Admin';
+import { ForgotPassword } from './components/ForgotPassword';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
@@ -33,39 +34,23 @@ function App() {
   const { user, setUser, loading, setLoading, clearSession } = useAuthStore();
 
   useEffect(() => {
-    clearSession();
+    // clearSession();
     
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email!,
-        });
+    // Simulate fetching user from local storage
+    const fetchUserFromLocalStorage = () => {
+      const user = localStorage.getItem('user');
+      if (user) {
+      setUser(JSON.parse(user));
       } else {
-        setUser(null);
+      setUser(null);
       }
       setLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        clearSession();
-        window.location.href = '/';
-      } else if (session?.user) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email!,
-        });
-      }
-      setLoading(false);
-    });
-
-    return () => {
-      subscription.unsubscribe();
     };
-  }, [setUser, setLoading, clearSession]);
+
+    fetchUserFromLocalStorage();
+
+   
+  }, []);
 
   if (loading) {
     return null;
@@ -82,6 +67,7 @@ function App() {
             <Route path="features" element={<Features />} />
             <Route path="faq" element={<FAQ />} />
             <Route path="blog" element={<Blog />} />
+            <Route path="forgotPassword" element={<ForgotPassword />} />
             <Route path="login" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
           </Route>
 
