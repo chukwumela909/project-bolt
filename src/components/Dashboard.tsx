@@ -420,7 +420,7 @@ function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Active Stakes</h2>
             <div className="text-sm text-slate-400">
-              {user.active_stake_count} active {activeStakes.length === 1 ? 'position' : 'positions'}
+              {activeStakes.length} active {activeStakes.length === 1 ? 'position' : 'positions'}
             </div>
           </div>
 
