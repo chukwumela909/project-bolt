@@ -19,9 +19,38 @@ import {
   TrendingUp,
   Calendar,
   AlertCircle,
+  User,
   Home
 } from 'lucide-react';
-import { u } from 'framer-motion/m';
+import { p } from 'framer-motion/client';
+
+
+const componentMap = {
+  Wallet: Wallet,
+  LineChart: LineChart,
+  Clock: Clock,
+  DollarSign: DollarSign
+};
+
+const PlanIcon = ({ iconName }: { iconName: string }) => {
+  // Get the component from the mapping
+  const IconComponent = componentMap[iconName as keyof typeof componentMap];
+
+  if (!IconComponent) {
+    // Handle the case where the iconName is not found in the mapping
+    return <div>Icon not found</div>;
+  }
+
+  // Render the component
+  return <IconComponent className="w-10 h-10 mb-4" />;
+};
+
+const activeStakesPlanMatch = {
+  "045a88bc-e647-11ef-8679-04421a23dd01" : "Core Vault",
+  "045a8a8b-e647-11ef-8679-04421a23dd01" : "Growth Nexus",
+  "045a8b03-e647-11ef-8679-04421a23dd01" : "Elite Matrix",
+  "174e640d-e6e1-11ef-8679-04421a23dd01" : "Legacy Protocol",
+}
 
 const stakingPlans = [
   {
@@ -60,18 +89,13 @@ const stakingPlans = [
 
 function Dashboard() {
   const navigate = useNavigate();
-  const { signOut } = useAuthStore();
-  const { fetchUserData, loading, user } = useUserStore();
+  const { clearSession } = useAuthStore();
+  const { fetchUserData, getInvestmentPlans, plans, loading, user } = useUserStore();
 
   const {
     stakes,
-    // loading,
+    loadingStakes,
     fetchStakes,
-    createStake,
-    restake,
-    unstake,
-    getDepositAddress,
-    initiateWithdrawal
   } = useStakingStore();
 
 
@@ -98,12 +122,11 @@ function Dashboard() {
   } = useReferralStore();
 
   const handleLogout = async () => {
-
     if (isLoggingOut) return;
 
     try {
       setIsLoggingOut(true);
-      await signOut();
+      clearSession();
       navigate('/', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
@@ -112,32 +135,34 @@ function Dashboard() {
   };
 
   useEffect(() => {
-  
-      // if (!user) {
-      //   alert("no user")
-      //   navigate('/');
-      //   return;
-      // }
 
-       fetchUserData();
+    // if (!user) {
+    //   alert("no user")
+    //   navigate('/');
+    //   return;
+    // }
+
+    fetchUserData();
+    getInvestmentPlans();
+    fetchStakes();
+    fetchEthPrice();
+    fetchReferralStats();
+    generateReferralCode();
+
+    const updateInterval = setInterval(() => {
+      fetchUserData();
+      getInvestmentPlans();
       fetchStakes();
       fetchEthPrice();
       fetchReferralStats();
-      generateReferralCode();
+      setLastUpdate(new Date());
+    }, 5 * 60 * 1000);
 
-      const updateInterval = setInterval(() => {
-        fetchUserData();
-        fetchStakes();
-        fetchEthPrice();
-        fetchReferralStats();
-        setLastUpdate(new Date());
-      }, 5 * 60 * 1000);
+    return () => clearInterval(updateInterval);
 
-      return () => clearInterval(updateInterval);
-   
 
-   
-  }, [user, fetchUserData]);
+
+  }, []);
 
   const fetchEthPrice = async () => {
     try {
@@ -188,14 +213,14 @@ function Dashboard() {
       setActionLoading(loadingKey);
       setSelectedPlan({ name: plan, minStake });
 
-      const address = await getDepositAddress(plan);
+      // const address = await getDepositAddress(plan);
 
-      if (!address) {
-        throw new Error('Failed to generate deposit address');
-      }
+      // if (!address) {
+      //   throw new Error('Failed to generate deposit address');
+      // }
 
-      console.log(`Successfully generated address for ${plan}:`, address);
-      setDepositAddress(address);
+      // console.log(`Successfully generated address for ${plan}:`, address);
+      // setDepositAddress(address);
       setDepositModalOpen(true);
     } catch (error) {
       console.error('Error in handleStake:', error);
@@ -212,29 +237,29 @@ function Dashboard() {
     }
   };
 
-  const handleRestake = async (stakeId: string) => {
-    try {
-      setActionLoading(stakeId + '_restake');
-      await restake(stakeId);
-      await fetchStakes();
-    } catch (error) {
-      console.error('Restake error:', error);
-    } finally {
-      setActionLoading(null);
-    }
-  };
+  // const handleRestake = async (stakeId: string) => {
+  //   try {
+  //     setActionLoading(stakeId + '_restake');
+  //     await restake(stakeId);
+  //     await fetchStakes();
+  //   } catch (error) {
+  //     console.error('Restake error:', error);
+  //   } finally {
+  //     setActionLoading(null);
+  //   }
+  // };
 
-  const handleUnstakeClick = (stake: any) => {
-    setSelectedUnstake(stake);
-    setUnstakeModalOpen(true);
-  };
+  // const handleUnstakeClick = (stake: any) => {
+  //   setSelectedUnstake(stake);
+  //   setUnstakeModalOpen(true);
+  // };
 
   const handleUnstakeConfirm = async () => {
     if (selectedUnstake) {
       try {
         setActionLoading(selectedUnstake.id + '_unstake');
-        await unstake(selectedUnstake.id);
-        await fetchStakes();
+        // await unstake(selectedUnstake.id);
+        // await fetchStakes();
         setUnstakeModalOpen(false);
         setSelectedUnstake(null);
       } catch (error) {
@@ -245,17 +270,21 @@ function Dashboard() {
     }
   };
 
-  const activeStakes = stakes.filter(stake => stake.status === 'active');
-  const totalStaked = stakes.reduce((acc, stake) => acc + stake.amount, 0);
-  const totalRewards = stakes.reduce((acc, stake) => acc + stake.total_earned, 0);
-  const dailyRewards = activeStakes.reduce((acc, stake) => acc + (stake.amount * stake.daily_yield / 100), 0);
+  const activeStakes = stakes ? stakes.filter(stake => stake.status === 'staked') : [];
+  // const totalStaked = stakes.reduce((acc, stake) => acc + stake.amount, 0);
+  // const totalRewards = stakes.reduce((acc, stake) => acc + stake.total_earned, 0);
+  // const dailyRewards = activeStakes.reduce((acc, stake) => acc + (stake.amount * stake.daily_yield / 100), 0);
 
   const username = user?.name;
 
   if (loading) {
     return <div>Loading...</div>;
   }
-  
+
+  if (loadingStakes) {
+    return <div>Loading Stakes...</div>;
+  }
+
   if (!user) {
     return <div>No user data available.</div>;
   }
@@ -276,22 +305,34 @@ function Dashboard() {
               <span>Last updated: {lastUpdate.toLocaleTimeString()}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => navigate('/')}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center space-x-2 text-sm transition-colors"
+                className="w-full bg-slate-700 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg  transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Home className="w-4 h-4" />
-                <span>Home</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleLogout}
-                disabled={isLoggingOut}
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center space-x-2 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/profile')}
+                className="w-full bg-slate-700 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg  transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <LogOut className="w-4 h-4" />
+                <User className="w-4 h-4 mr-2" />
+
+                Profile
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleLogout}
+                className="w-full bg-red-500 hover:bg-red-600 backdrop-blur-sm px-4 py-2 rounded-lg  transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
                 <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
@@ -349,7 +390,7 @@ function Dashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-400">Active Stakes</p>
-                <p className="text-2xl font-bold">{user.active_stake_count}</p>
+                <p className="text-2xl font-bold">{activeStakes.length}</p>
                 <p className="text-sm text-slate-400">Active positions</p>
               </div>
               <div className="bg-purple-500/20 p-2 rounded-lg">
@@ -379,15 +420,15 @@ function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Active Stakes</h2>
             <div className="text-sm text-slate-400">
-              {user.active_stake_count} active {user.active_stake_count === 1 ? 'position' : 'positions'}
+              {user.active_stake_count} active {activeStakes.length === 1 ? 'position' : 'positions'}
             </div>
           </div>
 
-          {user.active_stake_count > 0 ? (
+          {activeStakes.length > 0 ? (
             <div className="grid gap-4">
-              {activeStakes.map(stake => {
+               {activeStakes.map(stake => {
                 const daysRemaining = Math.ceil(
-                  (new Date(stake.end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+                  (new Date(stake.due).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
                 );
 
                 return (
@@ -399,22 +440,28 @@ function Dashboard() {
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <h3 className="text-xl font-bold">{stake.plan}</h3>
-                          <p className="text-sm text-slate-400">Started {new Date(stake.start_date).toLocaleDateString()}</p>
+                          <h3 className="text-xl font-bold">{activeStakesPlanMatch[stake.plan_id as keyof typeof activeStakesPlanMatch]}</h3>
+                          <p className="text-sm text-slate-400">Started {new Date(stake.staked_at).toLocaleDateString()}</p>
                         </div>
+
                         <div className="flex space-x-2">
-                          <motion.button
+                          {stake.restake == '0' ? (
+                            <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => handleRestake(stake.id)}
+                            // onClick={() => handleRestake(stake.id)}
                             disabled={actionLoading === stake.id + '_restake'}
                             className="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center space-x-2 text-sm hover:bg-green-600 transition-colors disabled:opacity-50"
                           >
                             <RefreshCw className="w-4 h-4" />
                             <span>Restake</span>
                           </motion.button>
+                          ) : (
+                            <div className=""></div>
+                          )}
+                          
 
-                          <motion.button
+                          {/* <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleUnstakeClick(stake)}
@@ -423,36 +470,36 @@ function Dashboard() {
                           >
                             <LogOut className="w-4 h-4" />
                             <span>Unstake</span>
-                          </motion.button>
+                          </motion.button> */}
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                           <p className="text-sm text-slate-400">Staked Amount</p>
-                          <p className="text-lg font-bold">{stake.amount.toFixed(4)} ETH</p>
-                          <p className="text-sm text-slate-400">≈ ${(stake.amount * ethPrice).toLocaleString()}</p>
+                        <p>  {Number(stake.amount).toFixed(4)}ETH</p>
+                          <p className="text-sm text-slate-400">≈ ${(Number(stake.amount) * ethPrice).toLocaleString()}</p>
                         </div>
                         <div>
                           <p className="text-sm text-slate-400">Daily Yield</p>
-                          <p className="text-lg font-bold text-green-400">{stake.daily_yield}%</p>
-                          <p className="text-sm text-green-500">{(stake.amount * stake.daily_yield / 100).toFixed(4)} ETH/day</p>
+                          <p className="text-lg font-bold text-green-400">{stake.earnings}%</p>
+                          <p className="text-sm text-green-500">{(Number(stake.amount) * Number(stake.earnings) / 100).toFixed(4)} ETH/day</p>
                         </div>
                         <div>
                           <p className="text-sm text-slate-400">Total Rewards</p>
-                          <p className="text-lg font-bold text-blue-400">{stake.total_earned.toFixed(4)} ETH</p>
-                          <p className="text-sm text-blue-500">≈ ${(stake.total_earned * ethPrice).toLocaleString()}</p>
+                          <p className="text-lg font-bold text-blue-400">{Number(stake.earnings).toFixed(4)} ETH</p>
+                          <p className="text-sm text-blue-500">≈ ${(Number(stake.earnings) * ethPrice).toLocaleString()}</p>
                         </div>
                         <div>
                           <p className="text-sm text-slate-400">Time Remaining</p>
                           <p className="text-lg font-bold">{daysRemaining} days</p>
-                          <p className="text-sm text-slate-400">Ends {new Date(stake.end_date).toLocaleDateString()}</p>
+                          <p className="text-sm text-slate-400">Ends {new Date(stake.due).toLocaleDateString()}</p>
                         </div>
                       </div>
                     </div>
                   </motion.div>
                 );
-              })}
+              })} 
             </div>
           ) : (
             <motion.div
@@ -467,11 +514,13 @@ function Dashboard() {
           )}
         </motion.div>
 
+        {/* <button onClick={() => {console.log("hello world")}} className='p-4 bg-slate-500'>just testing</button> */}
+
         <ReferralStats
-          referralCode={referralCode}
-          totalReferrals={totalReferrals}
-          activeReferrals={activeReferrals}
-          referralRewards={referralRewards}
+          referralCode={user.referral_code}
+          totalReferrals={Number(user.total_referrals)}
+          activeReferrals={Number(user.active_referrals)}
+          referralRewards={user.referral_rewards}
           ethPrice={ethPrice}
         />
 
@@ -481,7 +530,8 @@ function Dashboard() {
         >
           <h2 className="text-2xl font-bold mb-6">Available Plans</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stakingPlans.map(plan => {
+
+            {plans?.map(plan => {
               const isGeneratingAddress = actionLoading === `generating_address_${plan.name}`;
 
               return (
@@ -492,32 +542,33 @@ function Dashboard() {
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl transform translate-x-16 -translate-y-16" />
 
-                  <plan.icon className="w-10 h-10 mb-4" />
+                  <PlanIcon iconName={plan.icon} />
                   <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+
                   <p className="text-sm text-white/80 mb-4">{plan.description}</p>
 
                   <div className="space-y-3 mb-6">
                     <div className="flex justify-between items-center">
                       <span className="text-white/80">Min Stake</span>
-                      <span className="font-bold">{plan.minStake} ETH</span>
+                      <span className="font-bold">{plan.min_amount} ETH</span>
                     </div>
                     <div className="text-sm text-white/80 text-right">
-                      ≈ ${(plan.minStake * ethPrice).toLocaleString()}
+                      ≈ ${(Number(plan.min_amount) * ethPrice).toLocaleString()}
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-white/80">Daily Rewards</span>
-                      <span className="font-bold">{plan.yield}%</span>
+                      <span className="font-bold">{plan.dpy}%</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-white/80">Duration</span>
-                      <span className="font-bold">180 days</span>
+                      <span className="font-bold">{plan.lock_period_days} days</span>
                     </div>
                   </div>
 
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => handleStake(plan.name, plan.minStake, plan.yield)}
+                    onClick={() => handleStake(plan.name, Number(plan.min_amount), Number(plan.dpy))}
                     disabled={isGeneratingAddress}
                     className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm py-3 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -567,3 +618,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

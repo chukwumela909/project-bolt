@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import { Auth } from './components/Auth';
 import Dashboard from './components/Dashboard';
 import { useAuthStore } from './store/authStore';
+import { useUserStore } from './store/userStore';
 import { supabase } from './lib/supabase';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
@@ -12,13 +13,14 @@ import { FAQ } from './pages/FAQ';
 import { Blog } from './pages/Blog';
 import { Admin } from './pages/Admin';
 import { ForgotPassword } from './components/ForgotPassword';
+import { Profile } from './components/Profile';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!user) {
       navigate('/login');
     }
   }, [user, loading, navigate]);
@@ -35,21 +37,21 @@ function App() {
 
   useEffect(() => {
     // clearSession();
-    
+
     // Simulate fetching user from local storage
     const fetchUserFromLocalStorage = () => {
       const user = localStorage.getItem('user');
       if (user) {
-      setUser(JSON.parse(user));
+        setUser(JSON.parse(user));
       } else {
-      setUser(null);
+        setUser(null);
       }
       setLoading(false);
     };
 
     fetchUserFromLocalStorage();
 
-   
+
   }, []);
 
   if (loading) {
@@ -68,6 +70,7 @@ function App() {
             <Route path="faq" element={<FAQ />} />
             <Route path="blog" element={<Blog />} />
             <Route path="forgotPassword" element={<ForgotPassword />} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /> </ProtectedRoute>} />
             <Route path="login" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
           </Route>
 
@@ -79,6 +82,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
 
           <Route
             path="/admin"

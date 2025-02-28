@@ -18,27 +18,37 @@ interface User {
     daily_rewards: number;
 }
 
+interface InvestmentPlan {
+    id: string;
+    name: string;
+    min_amount: string;
+    max_amount: string;
+    dpy: string;
+    lock_period_days: string;
+    icon: string;
+    color: string;
+    description: string;
+    created_at: string;
+}
+
 interface UserState {
     user: User | null;
+    plans: InvestmentPlan[] | null;
     loading: boolean;
     setUser: (user: User | null) => void;
     error: string | null;
     fetchUserData: () => Promise<void>;
+    getInvestmentPlans: () => Promise<void>;
 }
 
-export const useUserStore = create<UserState>((set, get) => ({
+export const useUserStore = create<UserState>((set) => ({
     user: null,
+    plans: null,
     loading: false,
     setUser: (user) => set({ user }),
     error: null,
 
     fetchUserData: async () => {
-        const { user } = get();
-        if (user) {
-            console.log('User data already exists:', user);
-            return;
-        }
-
         set({ loading: true, error: null });
         try {
             const token = localStorage.getItem('auth-token');
@@ -75,6 +85,36 @@ export const useUserStore = create<UserState>((set, get) => ({
             set({ loading: false });
         }
     },
+
+    getInvestmentPlans: async () => {
+        set({ loading: true, error: null });
+        try {
+
+            const response = await axios.get("https://stake.betpaddi.com/api/investment/plans.php", {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            });
+
+            console.log(response);
+
+            if (response.status !== 200) throw new Error('Failed to fetch user data');
+            const data = response.data;
+            console.log(data);
+            set({ plans: data });
+            console.log('Investment plans:', useUserStore.getState().plans);
+        } catch (error) {
+            console.error('Fetch user data error:', error);
+            if (axios.isAxiosError(error) && error.response) {
+                set({ error: error.response.data });
+            } else {
+                set({ error: String(error) });
+            }
+        } finally {
+            set({ loading: false });
+        }
+    }
 }));
 
 // Usage example in a component

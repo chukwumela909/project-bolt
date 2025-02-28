@@ -16,29 +16,16 @@ export function ReferralStats({ referralCode, totalReferrals, activeReferrals, r
   const referralLink = `${window.location.origin}?ref=${referralCode}`;
 
   const copyToClipboard = () => {
+    console.log('Copying referral link:', referralLink);
     setError(null);
     
-    // Create a temporary input element
-    const textArea = document.createElement('textarea');
-    textArea.value = referralLink;
-    
-    // Make it invisible
-    textArea.style.position = 'fixed';
-    textArea.style.left = '-999999px';
-    textArea.style.top = '-999999px';
-    document.body.appendChild(textArea);
-    
-    try {
-      textArea.select();
-      document.execCommand('copy');
+    navigator.clipboard.writeText(referralLink).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    }).catch(err => {
       setError('Failed to copy link');
       console.error('Failed to copy:', err);
-    } finally {
-      document.body.removeChild(textArea);
-    }
+    });
   };
 
   return (
@@ -50,10 +37,8 @@ export function ReferralStats({ referralCode, totalReferrals, activeReferrals, r
             <span className="text-sm text-slate-400">Your Code:</span>
             <span className="font-mono font-bold">{referralCode}</span>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={copyToClipboard}
+          <button
+            onClick={() => copyToClipboard}
             className={`px-4 py-2 ${
               copied ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'
             } text-white rounded-lg flex items-center space-x-2 text-sm transition-colors w-full sm:w-auto justify-center`}
@@ -69,7 +54,7 @@ export function ReferralStats({ referralCode, totalReferrals, activeReferrals, r
                 <span>Copy Referral Link</span>
               </>
             )}
-          </motion.button>
+          </button>
         </div>
       </div>
 

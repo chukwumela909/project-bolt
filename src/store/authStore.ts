@@ -28,6 +28,7 @@ interface AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string, country: string, phone: string) => Promise<void>;
   forgotPassword: (email: string,) => Promise<void>;
+  updateProfile: ( name: string, country: string, phone: string) => Promise<void>;
   fetchUserData: () => Promise<void>;
   signOut: () => Promise<void>;
   clearSession: () => void;
@@ -140,6 +141,60 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (response.status == 200) {
         const alertMessage = document.createElement('div');
         alertMessage.textContent = "Password reset link has been sent to your email";
+        alertMessage.style.position = 'fixed';
+        alertMessage.style.top = '50%';
+        alertMessage.style.left = '50%';
+        alertMessage.style.transform = 'translate(-50%, -50%)';
+        alertMessage.style.backgroundColor = 'green';
+        alertMessage.style.color = 'white';
+        alertMessage.style.padding = '10px';
+        alertMessage.style.borderRadius = '5px';
+        document.body.appendChild(alertMessage);
+
+        setTimeout(() => {
+          document.body.removeChild(alertMessage);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Sign in error:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        throw error.response.data;
+      } else {
+        throw error;
+      }
+    }
+  },
+
+  updateProfile: async ( name, country, phone) => {
+ 
+    try {
+      const token = localStorage.getItem('auth-token');
+      console.log(token);
+      if (!token){
+        console.log("No auth token found")
+        throw new Error('No auth token found');
+      } 
+      const response = await axios.post("https://stake.betpaddi.com/api/auth/update-profile.php", {
+        token,
+        name,
+        country,
+        phone
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+
+      if (response.status !== 200) throw new Error('Sign in failed');
+
+      const data = response.data;
+      console.log(data);
+      // set({ user: data.user });
+      if (response.status == 200) {
+        const alertMessage = document.createElement('div');
+        alertMessage.textContent = "User updated successfully";
         alertMessage.style.position = 'fixed';
         alertMessage.style.top = '50%';
         alertMessage.style.left = '50%';
