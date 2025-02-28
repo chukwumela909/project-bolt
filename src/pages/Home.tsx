@@ -5,14 +5,11 @@ import {
   Wallet, 
   Shield, 
   TrendingUp, 
-
   ArrowRight, 
-
   Clock,
   Mail,
   Send,
   DollarSign,
-
   BarChart3
 } from 'lucide-react';
 

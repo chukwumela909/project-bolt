@@ -12,23 +12,24 @@ import { Blog } from './pages/Blog';
 import { Admin } from './pages/Admin';
 import { ForgotPassword } from './components/ForgotPassword';
 import { Profile } from './components/Profile';
+// import { useUserStore } from './store/userStore';
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuthStore();
-  const navigate = useNavigate();
+// function ProtectedRoute({ children }: { children: React.ReactNode }) {
+//   const { user, loading } = useUserStore();
+//   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    }
-  }, [user, loading, navigate]);
+//   useEffect(() => {
+//     if (!user) {
+//       navigate('/login');
+//     }
+//   }, [user, loading]);
 
-  if (loading) {
-    return null;
-  }
+//   if (loading) {
+//     return null;
+//   }
 
-  return user ? <>{children}</> : null;
-}
+//   return user ? <>{children}</> : null;
+// }
 
 function App() {
   const { user, setUser, loading, setLoading } = useAuthStore();
@@ -68,16 +69,16 @@ function App() {
             <Route path="faq" element={<FAQ />} />
             <Route path="blog" element={<Blog />} />
             <Route path="forgotPassword" element={<ForgotPassword />} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /> </ProtectedRoute>} />
+            <Route path="/profile" element={<Profile /> } />
             <Route path="login" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
           </Route>
 
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+             
                 <Dashboard />
-              </ProtectedRoute>
+             
             }
           />
 
@@ -85,9 +86,9 @@ function App() {
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
+             
                 <Admin />
-              </ProtectedRoute>
+             
             }
           />
 

@@ -391,7 +391,7 @@ function Dashboard() {
             <div className="grid gap-4">
                {activeStakes.map(stake => {
                 const daysRemaining = Math.ceil(
-                  (new Date(stake.due).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+                  (new Date(stake.staked_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
                 );
 
                 return (
