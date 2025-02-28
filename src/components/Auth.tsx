@@ -36,7 +36,7 @@ export function Auth() {
     message: '',
   });
 
-  const { signIn, signUp, fetchUserData } = useAuthStore();
+  const { signIn, signUp, } = useAuthStore();
 
   const validatePassword = (password: string) => {
     let score = 0;

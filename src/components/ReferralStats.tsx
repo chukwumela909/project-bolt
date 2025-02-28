@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Users, Award, TrendingUp, Link as LinkIcon, CheckCircle2, Copy, AlertCircle } from 'lucide-react';
+import  { useState } from 'react';
+import { Users, Award, TrendingUp, CheckCircle2, Copy, AlertCircle } from 'lucide-react';
 
 interface ReferralStatsProps {
   referralCode: string;

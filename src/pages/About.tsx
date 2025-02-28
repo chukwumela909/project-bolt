@@ -1,7 +1,7 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Shield, Users, Globe, Award, Wallet, TrendingUp, Lock, RefreshCw } from 'lucide-react';
+import { Shield, Users, Globe, Award, Lock, RefreshCw } from 'lucide-react';
 
 export function About() {
   return (

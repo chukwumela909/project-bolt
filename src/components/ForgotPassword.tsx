@@ -4,15 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import {
     Mail,
-    Lock,
-    User,
-    Phone,
-    Globe,
-    Shield,
+
     AlertCircle,
-    CheckCircle2,
-    Eye,
-    EyeOff,
     RefreshCw
 } from 'lucide-react';
 

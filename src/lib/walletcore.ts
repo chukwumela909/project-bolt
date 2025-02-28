@@ -1,6 +1,6 @@
 // Mock implementation for demo purposes
 export const walletCoreService = {
-  async generateDepositAddress(userId: string, plan: string): Promise<string> {
+  async generateDepositAddress( plan: string): Promise<string> {
     // Generate a demo Ethereum address
     const demoAddress = `0x${Array.from({length: 40}, () => 
       Math.floor(Math.random() * 16).toString(16)).join('')}`;
@@ -24,7 +24,7 @@ export const walletCoreService = {
     return txHash;
   },
 
-  startTransactionPolling(userId: string, callback: (transactions: any[]) => void) {
+  startTransactionPolling( callback: (transactions: any[]) => void) {
     // Demo transaction polling
     const interval = setInterval(() => {
       callback([{

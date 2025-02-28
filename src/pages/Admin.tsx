@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import  { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { supabase } from '../lib/supabase';
 import {
   Users,
   Wallet,
-  Settings,
   AlertTriangle,
   CheckCircle2,
   XCircle,
   RefreshCw,
   Search,
-  Filter,
   Download,
   ArrowUpDown,
   MoreVertical,
@@ -60,11 +57,14 @@ export function Admin() {
 
   // Check if user is admin
   useEffect(() => {
+    console.log(sortConfig);
     const checkAdmin = async () => {
       if (!user) {
         navigate('/login');
         return;
       }
+
+      console.log(users)
 
       const { data: profile } = await supabase
         .from('profiles')
@@ -137,12 +137,7 @@ export function Admin() {
         stake.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         stake.user_id.toLowerCase().includes(searchTerm.toLowerCase()))
     )
-    .sort((a, b) => {
-      const direction = sortConfig.direction === 'asc' ? 1 : -1;
-      if (a[sortConfig.key] < b[sortConfig.key]) return -1 * direction;
-      if (a[sortConfig.key] > b[sortConfig.key]) return 1 * direction;
-      return 0;
-    });
+    
 
   if (loading) {
     return (

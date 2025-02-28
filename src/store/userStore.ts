@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
-import React, { useEffect } from 'react';
+
 
 interface User {
     id: string;

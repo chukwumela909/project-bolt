@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
@@ -22,7 +22,7 @@ import {
   User,
   Home
 } from 'lucide-react';
-import { p } from 'framer-motion/client';
+
 
 
 const componentMap = {
@@ -52,40 +52,7 @@ const activeStakesPlanMatch = {
   "174e640d-e6e1-11ef-8679-04421a23dd01" : "Legacy Protocol",
 }
 
-const stakingPlans = [
-  {
-    name: 'Core Vault',
-    minStake: 0.05,
-    yield: 1.5,
-    color: 'from-blue-500 to-blue-600',
-    icon: Wallet,
-    description: 'Perfect for beginners. Low minimum stake with stable returns.'
-  },
-  {
-    name: 'Growth Nexus',
-    minStake: 2,
-    yield: 2.5,
-    color: 'from-purple-500 to-purple-600',
-    icon: LineChart,
-    description: 'Balanced risk-reward ratio for growing portfolios.'
-  },
-  {
-    name: 'Elite Matrix',
-    minStake: 10,
-    yield: 3.5,
-    color: 'from-emerald-500 to-emerald-600',
-    icon: Clock,
-    description: 'Enhanced yields for serious investors.'
-  },
-  {
-    name: 'Legacy Protocol',
-    minStake: 20,
-    yield: 5,
-    color: 'from-amber-500 to-amber-600',
-    icon: DollarSign,
-    description: 'Premium tier with maximum rewards for whale investors.'
-  }
-];
+
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -103,7 +70,7 @@ function Dashboard() {
   const [ethPrice, setEthPrice] = useState<number>(0);
   const [ethPriceLoading, setEthPriceLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-  const [selectedStake, setSelectedStake] = useState<string | null>(null);
+  // const [selectedStake, setSelectedStake] = useState<string | null>(null);
   const [unstakeModalOpen, setUnstakeModalOpen] = useState(false);
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [selectedUnstake, setSelectedUnstake] = useState<any>(null);
@@ -113,10 +80,6 @@ function Dashboard() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const {
-    referralCode,
-    totalReferrals,
-    activeReferrals,
-    referralRewards,
     fetchReferralStats,
     generateReferralCode
   } = useReferralStore();
@@ -201,41 +164,41 @@ function Dashboard() {
     }
   };
 
-  const handleStake = async (plan: string, minStake: number, dailyYield: number) => {
-    try {
-      const loadingKey = `generating_address_${plan}`;
-      if (actionLoading === loadingKey) {
-        console.log(`Already generating address for ${plan}`);
-        return;
-      }
+  // const handleStake = async (plan: string, minStake: number ) => {
+  //   try {
+  //     const loadingKey = `generating_address_${plan}`;
+  //     if (actionLoading === loadingKey) {
+  //       console.log(`Already generating address for ${plan}`);
+  //       return;
+  //     }
 
-      console.log(`Starting address generation for ${plan}`);
-      setActionLoading(loadingKey);
-      setSelectedPlan({ name: plan, minStake });
+  //     console.log(`Starting address generation for ${plan}`);
+  //     setActionLoading(loadingKey);
+  //     setSelectedPlan({ name: plan, minStake });
 
-      // const address = await getDepositAddress(plan);
+  //     // const address = await getDepositAddress(plan);
 
-      // if (!address) {
-      //   throw new Error('Failed to generate deposit address');
-      // }
+  //     // if (!address) {
+  //     //   throw new Error('Failed to generate deposit address');
+  //     // }
 
-      // console.log(`Successfully generated address for ${plan}:`, address);
-      // setDepositAddress(address);
-      setDepositModalOpen(true);
-    } catch (error) {
-      console.error('Error in handleStake:', error);
-      const errorMessage = error instanceof Error
-        ? error.message
-        : 'Failed to generate deposit address. Please try again.';
-      alert(errorMessage);
-    } finally {
-      if (!depositModalOpen) {
-        setActionLoading(null);
-        setSelectedPlan(null);
-        setDepositAddress('');
-      }
-    }
-  };
+  //     // console.log(`Successfully generated address for ${plan}:`, address);
+  //     // setDepositAddress(address);
+  //     setDepositModalOpen(true);
+  //   } catch (error) {
+  //     console.error('Error in handleStake:', error);
+  //     const errorMessage = error instanceof Error
+  //       ? error.message
+  //       : 'Failed to generate deposit address. Please try again.';
+  //     alert(errorMessage);
+  //   } finally {
+  //     if (!depositModalOpen) {
+  //       setActionLoading(null);
+  //       setSelectedPlan(null);
+  //       setDepositAddress('');
+  //     }
+  //   }
+  // };
 
   // const handleRestake = async (stakeId: string) => {
   //   try {
@@ -568,7 +531,7 @@ function Dashboard() {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => handleStake(plan.name, Number(plan.min_amount), Number(plan.dpy))}
+                    // onClick={() => handleStake(plan.name, Number(plan.min_amount), Number(plan.dpy))}
                     disabled={isGeneratingAddress}
                     className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm py-3 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
                   >

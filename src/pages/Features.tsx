@@ -1,18 +1,14 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   Wallet,
   Shield,
-  TrendingUp,
   Users,
   Lock,
   Clock,
-  Zap,
   RefreshCw,
-  Award,
   Globe,
-  DollarSign,
   BarChart3,
   Percent,
   CheckCircle2

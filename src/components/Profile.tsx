@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import { useUserStore } from '../store/userStore';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
-import { Mail, User, Phone, Globe, Save, RefreshCw, Lock, EyeOff, Eye, CheckCircle2, AlertCircle, Shield } from 'lucide-react';
+import {  User, Phone, Globe, Save, RefreshCw, } from 'lucide-react';
 
 export function Profile() {
-    const { user, setUser, fetchUserData } = useUserStore();
+    const { user } = useUserStore();
     const { updateProfile } = useAuthStore();
     const [formData, setFormData] = useState({
         fullName: '',

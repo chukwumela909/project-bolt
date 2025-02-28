@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import { Auth } from './components/Auth';
 import Dashboard from './components/Dashboard';
 import { useAuthStore } from './store/authStore';
-import { useUserStore } from './store/userStore';
-import { supabase } from './lib/supabase';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
@@ -33,7 +31,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-  const { user, setUser, loading, setLoading, clearSession } = useAuthStore();
+  const { user, setUser, loading, setLoading } = useAuthStore();
 
   useEffect(() => {
     // clearSession();

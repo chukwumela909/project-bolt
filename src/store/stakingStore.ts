@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
-import { walletCoreService } from '../lib/walletcore';
-import { ethers } from 'ethers';
+
 
 
 interface Stake {
@@ -38,7 +37,7 @@ interface StakingState {
 
 
 
-const useStakingStore = create<StakingState>((set, get) => ({
+const useStakingStore = create<StakingState>((set) => ({
   stakes: null,
   loadingStakes: false,
   error: null,

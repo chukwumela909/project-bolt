@@ -1,20 +1,18 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   Wallet, 
   Shield, 
   TrendingUp, 
-  Users, 
+
   ArrowRight, 
-  CheckCircle2,
-  Globe,
-  Zap,
+
   Clock,
   Mail,
   Send,
   DollarSign,
-  Percent,
+
   BarChart3
 } from 'lucide-react';
 
