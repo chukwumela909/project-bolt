@@ -164,18 +164,9 @@ function Dashboard() {
 
   const handleStake = async (plan: string, planId: string, minStake: number) => {
     try {
-      const loadingKey = `generating_address_${plan}`;
-      if (actionLoading === loadingKey) {
-        console.log(`Already generating address for ${plan}`);
-        return;
-      }
-
-      console.log(`Starting address generation for ${plan}`);
-      setActionLoading(loadingKey);
       setSelectedPlan({ name: plan, minStake });
       console.log(`Selected plan: ${plan}, ${planId}, ${minStake}`);
-
-       getDepositAddress(planId);
+      getDepositAddress(planId);
       if (deposit_address) {
         setDepositAddress(deposit_address);
       } else {
@@ -184,11 +175,7 @@ function Dashboard() {
 
       setDepositModalOpen(true);
     } catch (error) {
-      console.error('Error in handleStake:', error);
-      const errorMessage = error instanceof Error
-        ? error.message
-        : 'Failed to generate deposit address. Please try again.';
-      alert(errorMessage);
+      console.error('Error handling stake:', error);
     } finally {
       // if (!depositModalOpen) {
       //   setActionLoading(null);
@@ -210,26 +197,27 @@ function Dashboard() {
   //   }
   // };
 
-  // const handleUnstakeClick = (stake: any) => {
-  //   setSelectedUnstake(stake);
-  //   setUnstakeModalOpen(true);
+  const handleUnstakeClick = (stake: any) => {
+    setSelectedUnstake(stake);
+    setUnstakeModalOpen(true);
+  };
+
+  //  const handleUnstakeConfirm = async (id: string, walletAddress: string, unstakeAmount:string) => {
+  //   if (selectedUnstake) {
+  //     try {
+  //      unstake(id, walletAddress, unstakeAmount.toString());
+  //       // await fetchStakes();
+  //       setUnstakeModalOpen(false);
+  //       setSelectedUnstake(null);
+  //     } catch (error) {
+  //       console.error('Unstake error:', error);
+  //     } finally {
+  //       setActionLoading(null);
+  //     }
+  //   }
   // };
 
-  const handleUnstakeConfirm = async () => {
-    if (selectedUnstake) {
-      try {
-        setActionLoading(selectedUnstake.id + '_unstake');
-        // await unstake(selectedUnstake.id);
-        // await fetchStakes();
-        setUnstakeModalOpen(false);
-        setSelectedUnstake(null);
-      } catch (error) {
-        console.error('Unstake error:', error);
-      } finally {
-        setActionLoading(null);
-      }
-    }
-  };
+
 
   const activeStakes = stakes ? stakes.filter(stake => stake.status === 'staked') : [];
   // const totalStaked = stakes.reduce((acc, stake) => acc + stake.amount, 0);
@@ -318,12 +306,12 @@ function Dashboard() {
                 <LogOut className="w-4 h-4 mr-2" />
                 <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
               </motion.button>
-              
+
             </div>
-            
+
           </div>
         </div>
-        
+
 
         {ethPriceLoading && (
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex items-center space-x-3">
@@ -452,16 +440,16 @@ function Dashboard() {
                           )}
 
 
-                          {/* <motion.button
+                          <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleUnstakeClick(stake)}
-                            disabled={actionLoading === stake.id + '_unstake'}
+                            // disabled={actionLoading === stake.id + '_unstake'}
                             className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center space-x-2 text-sm hover:bg-red-600 transition-colors disabled:opacity-50"
                           >
                             <LogOut className="w-4 h-4" />
                             <span>Unstake</span>
-                          </motion.button> */}
+                          </motion.button>
                         </div>
                       </div>
 
@@ -579,8 +567,15 @@ function Dashboard() {
           setUnstakeModalOpen(false);
           setSelectedUnstake(null);
         }}
-        onConfirm={handleUnstakeConfirm}
-        stake={selectedUnstake || { amount: 0, total_earned: 0, end_date: new Date().toISOString() }}
+        stake={selectedUnstake || {
+
+          id: '0',
+          amount: '0',
+          earnings: '0',
+          lock_period_days: '0',
+          penalty: '0',
+          staked_at: '0'
+        }}
         ethPrice={ethPrice}
       />
 

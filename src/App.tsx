@@ -1,4 +1,4 @@
-import  { useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Auth } from './components/Auth';
 import Dashboard from './components/Dashboard';
@@ -13,7 +13,7 @@ import { Admin } from './pages/Admin';
 import { ForgotPassword } from './components/ForgotPassword';
 import { Profile } from './components/Profile';
 import { ChangePassword } from './components/ChangePassword';
-import {Terms }from './components/Terms';
+import { Terms } from './components/Terms';
 import { PrivacyPolicy } from './components/Privacy';
 // import { useUserStore } from './store/userStore';
 
@@ -75,26 +75,28 @@ function App() {
             <Route path="privacy" element={<PrivacyPolicy />} />
             <Route path="forgotPassword" element={<ForgotPassword />} />
             <Route path="changePassword" element={<ChangePassword />} />
-            <Route path="/profile" element={<Profile /> } />
+
             <Route path="login" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
           </Route>
 
           <Route
             path="/dashboard"
             element={
-             
-                <Dashboard />
-             
+
+              <Dashboard />
+
             }
           />
+
+          <Route path="/profile" element={<Profile />} />
 
 
           <Route
             path="/admin"
             element={
-             
-                <Admin />
-             
+
+              <Admin />
+
             }
           />
 

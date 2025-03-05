@@ -27,10 +27,12 @@ interface StakingState {
   stakes: Stake[] | null;
   loadingStakes: boolean;
   loadingAddress: boolean;
+  loadingUnstake: boolean;
   deposit_address: string | null;
   error: string | null;
   fetchStakes: () => Promise<void>;
   getDepositAddress: (plan: string) => Promise<void>;
+  unstake: (stake_id: string, wallet_address: string, unstake_amount: string) => Promise<void>;
 
   // createStake: (plan: string, amount: number, dailyYield: number) => Promise<string>;
   // restake: (stakeId: string) => Promise<void>;
@@ -44,6 +46,7 @@ const useStakingStore = create<StakingState>((set) => ({
   stakes: null,
   loadingStakes: false,
   loadingAddress: false,
+  loadingUnstake: false,
   deposit_address: null,
   error: null,
 
@@ -118,7 +121,47 @@ const useStakingStore = create<StakingState>((set) => ({
       }
     } finally {
       set({ loadingAddress: false });
-      return 
+      return
+    }
+  },
+
+  unstake: async (stake_id: string, wallet_address: string, unstake_amount: string): Promise<void> => {
+    set({ loadingUnstake: true });
+    try {
+      const token = localStorage.getItem('auth-token');
+      console.log(token);
+      if (!token) {
+        console.log("No auth token found")
+        throw new Error('No auth token found');
+      }
+      const response = await axios.post("https://stake.betpaddi.com/api/investment/unstake.php", {
+        token: token,
+        stake_id: stake_id,
+        wallet_address: wallet_address,
+        unstake_amount: unstake_amount
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+      console.log(response);
+
+      if (response.status !== 200) throw new Error('Failed to unstake');
+      const data = response.data;
+      console.log(data);
+    } catch (error) {
+      console.error('unstake error:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        set({ error: error.response.data });
+      } else {
+        set({ error: String(error) });
+        throw error;
+      }
+    } finally {
+      set({ loadingUnstake: false });
+      return
     }
   },
 
