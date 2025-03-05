@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
@@ -46,10 +46,10 @@ const PlanIcon = ({ iconName }: { iconName: string }) => {
 };
 
 const activeStakesPlanMatch = {
-  "045a88bc-e647-11ef-8679-04421a23dd01" : "Core Vault",
-  "045a8a8b-e647-11ef-8679-04421a23dd01" : "Growth Nexus",
-  "045a8b03-e647-11ef-8679-04421a23dd01" : "Elite Matrix",
-  "174e640d-e6e1-11ef-8679-04421a23dd01" : "Legacy Protocol",
+  "045a88bc-e647-11ef-8679-04421a23dd01": "Core Vault",
+  "045a8a8b-e647-11ef-8679-04421a23dd01": "Growth Nexus",
+  "045a8b03-e647-11ef-8679-04421a23dd01": "Elite Matrix",
+  "174e640d-e6e1-11ef-8679-04421a23dd01": "Legacy Protocol",
 }
 
 
@@ -62,7 +62,10 @@ function Dashboard() {
   const {
     stakes,
     loadingStakes,
+    loadingAddress,
     fetchStakes,
+    getDepositAddress,
+    deposit_address,
   } = useStakingStore();
 
 
@@ -81,7 +84,7 @@ function Dashboard() {
 
   const {
     fetchReferralStats,
-    generateReferralCode
+    generateReferralCode,
   } = useReferralStore();
 
   const handleLogout = async () => {
@@ -89,7 +92,7 @@ function Dashboard() {
 
     try {
       setIsLoggingOut(true);
-      clearSession();
+      await clearSession();
       navigate('/', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
@@ -98,19 +101,14 @@ function Dashboard() {
   };
 
   useEffect(() => {
-
-    // if (!user) {
-    //   alert("no user")
-    //   navigate('/');
-    //   return;
-    // }
-
     fetchUserData();
     getInvestmentPlans();
     fetchStakes();
     fetchEthPrice();
     fetchReferralStats();
     generateReferralCode();
+
+
 
     const updateInterval = setInterval(() => {
       fetchUserData();
@@ -164,41 +162,41 @@ function Dashboard() {
     }
   };
 
-  // const handleStake = async (plan: string, minStake: number ) => {
-  //   try {
-  //     const loadingKey = `generating_address_${plan}`;
-  //     if (actionLoading === loadingKey) {
-  //       console.log(`Already generating address for ${plan}`);
-  //       return;
-  //     }
+  const handleStake = async (plan: string, planId: string, minStake: number) => {
+    try {
+      const loadingKey = `generating_address_${plan}`;
+      if (actionLoading === loadingKey) {
+        console.log(`Already generating address for ${plan}`);
+        return;
+      }
 
-  //     console.log(`Starting address generation for ${plan}`);
-  //     setActionLoading(loadingKey);
-  //     setSelectedPlan({ name: plan, minStake });
+      console.log(`Starting address generation for ${plan}`);
+      setActionLoading(loadingKey);
+      setSelectedPlan({ name: plan, minStake });
+      console.log(`Selected plan: ${plan}, ${planId}, ${minStake}`);
 
-  //     // const address = await getDepositAddress(plan);
+       getDepositAddress(planId);
+      if (deposit_address) {
+        setDepositAddress(deposit_address);
+      } else {
+        throw new Error('Failed to generate deposit address');
+      }
 
-  //     // if (!address) {
-  //     //   throw new Error('Failed to generate deposit address');
-  //     // }
-
-  //     // console.log(`Successfully generated address for ${plan}:`, address);
-  //     // setDepositAddress(address);
-  //     setDepositModalOpen(true);
-  //   } catch (error) {
-  //     console.error('Error in handleStake:', error);
-  //     const errorMessage = error instanceof Error
-  //       ? error.message
-  //       : 'Failed to generate deposit address. Please try again.';
-  //     alert(errorMessage);
-  //   } finally {
-  //     if (!depositModalOpen) {
-  //       setActionLoading(null);
-  //       setSelectedPlan(null);
-  //       setDepositAddress('');
-  //     }
-  //   }
-  // };
+      setDepositModalOpen(true);
+    } catch (error) {
+      console.error('Error in handleStake:', error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Failed to generate deposit address. Please try again.';
+      alert(errorMessage);
+    } finally {
+      // if (!depositModalOpen) {
+      //   setActionLoading(null);
+      //   setSelectedPlan(null);
+      //   setDepositAddress('');
+      // }
+    }
+  };
 
   // const handleRestake = async (stakeId: string) => {
   //   try {
@@ -241,15 +239,39 @@ function Dashboard() {
   const username = user?.name;
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex flex-col items-center justify-center min-h-screen text-center space-y-4">
+      <p className="text-xl font-semibold text-slate-400">Loading</p>
+      <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+    </div>;
   }
 
   if (loadingStakes) {
-    return <div>Loading Stakes...</div>;
+    return <div className="flex flex-col items-center justify-center min-h-screen text-center space-y-4">
+      <p className="text-xl font-semibold text-slate-400">Loading stakes</p>
+      <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+    </div>;
+  }
+
+  if (loadingAddress) {
+    return <div className="flex flex-col items-center justify-center min-h-screen text-center space-y-4">
+      <p className="text-xl font-semibold text-slate-400">Generating address</p>
+      <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+    </div>;
   }
 
   if (!user) {
-    return <div>No user data available.</div>;
+    return <div className="flex flex-col items-center justify-center min-h-screen text-center space-y-4">
+      <p className="text-xl font-semibold text-slate-400">No user data available.</p>
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => navigate('/login')}
+        className=" bg-slate-700 mb-2 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg  transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Go to login
+      </motion.button>
+    </div>;
+
   }
 
   return (
@@ -263,16 +285,16 @@ function Dashboard() {
             <p className="text-sm text-slate-400 mt-1">Welcome back, {loading ? "..." : username} </p>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm text-slate-400">
+            <div className=" hidden md:flex items-center space-x-2 text-sm text-slate-400">
               <RefreshCw className="w-4 h-4" />
               <span>Last updated: {lastUpdate.toLocaleTimeString()}</span>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col md:flex-row items-center space-x-2">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate('/')}
-                className="w-full bg-slate-700 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg  transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-slate-700 mb-2 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg  transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Home className="w-4 h-4 mr-2" />
                 Home
@@ -281,7 +303,7 @@ function Dashboard() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate('/profile')}
-                className="w-full bg-slate-700 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg  transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-slate-700 mb-2 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg  transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <User className="w-4 h-4 mr-2" />
 
@@ -389,9 +411,12 @@ function Dashboard() {
 
           {activeStakes.length > 0 ? (
             <div className="grid gap-4">
-               {activeStakes.map(stake => {
-                const daysRemaining = Math.ceil(
-                  (new Date(stake.staked_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+              {activeStakes.map(stake => {
+                const daysRemaining = Math.max(
+                  0,
+                  Math.ceil(
+                    (new Date(stake.staked_at).getTime() + Number(stake.lock_period_days) * 24 * 60 * 60 * 1000 - new Date().getTime()) / (1000 * 60 * 60 * 24)
+                  )
                 );
 
                 return (
@@ -410,19 +435,19 @@ function Dashboard() {
                         <div className="flex space-x-2">
                           {stake.restake == '0' ? (
                             <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            // onClick={() => handleRestake(stake.id)}
-                            disabled={actionLoading === stake.id + '_restake'}
-                            className="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center space-x-2 text-sm hover:bg-green-600 transition-colors disabled:opacity-50"
-                          >
-                            <RefreshCw className="w-4 h-4" />
-                            <span>Restake</span>
-                          </motion.button>
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              // onClick={() => handleRestake(stake.id)}
+                              disabled={actionLoading === stake.id + '_restake'}
+                              className="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center space-x-2 text-sm hover:bg-green-600 transition-colors disabled:opacity-50"
+                            >
+                              <RefreshCw className="w-4 h-4" />
+                              <span>Restake</span>
+                            </motion.button>
                           ) : (
                             <div className=""></div>
                           )}
-                          
+
 
                           {/* <motion.button
                             whileHover={{ scale: 1.05 }}
@@ -440,12 +465,12 @@ function Dashboard() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                           <p className="text-sm text-slate-400">Staked Amount</p>
-                        <p>  {Number(stake.amount).toFixed(4)}ETH</p>
+                          <p>  {Number(stake.amount).toFixed(4)}ETH</p>
                           <p className="text-sm text-slate-400">≈ ${(Number(stake.amount) * ethPrice).toLocaleString()}</p>
                         </div>
                         <div>
                           <p className="text-sm text-slate-400">Daily Yield</p>
-                          <p className="text-lg font-bold text-green-400">{stake.earnings}%</p>
+                          <p> {((Number(stake.earnings) / Number(stake.amount)) / Number(stake.lock_period_days) * 100).toFixed(2)}%</p>
                           <p className="text-sm text-green-500">{(Number(stake.amount) * Number(stake.earnings) / 100).toFixed(4)} ETH/day</p>
                         </div>
                         <div>
@@ -456,13 +481,13 @@ function Dashboard() {
                         <div>
                           <p className="text-sm text-slate-400">Time Remaining</p>
                           <p className="text-lg font-bold">{daysRemaining} days</p>
-                          <p className="text-sm text-slate-400">Ends {new Date(stake.due).toLocaleDateString()}</p>
+                          <p>Ends {new Date(new Date(stake.staked_at).getTime() + Number(stake.lock_period_days) * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
                         </div>
                       </div>
                     </div>
                   </motion.div>
                 );
-              })} 
+              })}
             </div>
           ) : (
             <motion.div
@@ -531,21 +556,12 @@ function Dashboard() {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    // onClick={() => handleStake(plan.name, Number(plan.min_amount), Number(plan.dpy))}
-                    disabled={isGeneratingAddress}
+                    onClick={() => handleStake(plan.name, plan.id, Number(plan.min_amount),)}
+                    disabled={loadingAddress}
                     className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm py-3 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isGeneratingAddress ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>Generating Address...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Stake Now</span>
-                        <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                      </>
-                    )}
+                    <span>Stake Now</span>
+                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </motion.button>
                 </motion.div>
               );

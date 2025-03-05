@@ -12,6 +12,9 @@ import { Blog } from './pages/Blog';
 import { Admin } from './pages/Admin';
 import { ForgotPassword } from './components/ForgotPassword';
 import { Profile } from './components/Profile';
+import { ChangePassword } from './components/ChangePassword';
+import {Terms }from './components/Terms';
+import { PrivacyPolicy } from './components/Privacy';
 // import { useUserStore } from './store/userStore';
 
 // function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -68,7 +71,10 @@ function App() {
             <Route path="features" element={<Features />} />
             <Route path="faq" element={<FAQ />} />
             <Route path="blog" element={<Blog />} />
+            <Route path="termsandcondition" element={<Terms />} />
+            <Route path="privacy" element={<PrivacyPolicy />} />
             <Route path="forgotPassword" element={<ForgotPassword />} />
+            <Route path="changePassword" element={<ChangePassword />} />
             <Route path="/profile" element={<Profile /> } />
             <Route path="login" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
           </Route>

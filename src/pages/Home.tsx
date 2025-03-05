@@ -13,7 +13,9 @@ import {
   BarChart3
 } from 'lucide-react';
 
+
 export function Home() {
+  
   return (
     <div>
       {/* Hero Section */}

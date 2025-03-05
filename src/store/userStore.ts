@@ -69,7 +69,9 @@ export const useUserStore = create<UserState>((set) => ({
 
             console.log(response);
 
-            if (response.status !== 200) throw new Error('Failed to fetch user data');
+            if (response.status !== 200) {
+                throw new Error('Failed to fetch user data');
+            }
             const data = response.data;
             console.log(data);
             set({ user: data });

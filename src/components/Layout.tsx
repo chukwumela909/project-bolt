@@ -2,17 +2,28 @@ import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Wallet, Menu, X } from 'lucide-react';
+import { useUserStore } from '../store/userStore';
+import logo from '../../images/starkordMainLogo.png';
+
+
 
 export function Layout() {
+  const { user} = useUserStore();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const location = useLocation();
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     fetchUserData();
+  //   }, 3000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const navItems = [
     { path: '/', label: 'Home' },
     { path: '/features', label: 'Features' },
     { path: '/about', label: 'About' },
     { path: '/faq', label: 'FAQ' },
-    { path: '/blog', label: 'Blog' },
   ];
 
   return (
@@ -21,10 +32,7 @@ export function Layout() {
         <nav className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
-              <Wallet className="w-8 h-8 text-blue-400" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Starkord
-              </span>
+              <img src={logo} alt="logo" className="w-24 md:w-32" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -33,11 +41,10 @@ export function Layout() {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm font-medium transition-colors ${
-                    location.pathname === item.path
+                  className={`text-sm font-medium transition-colors ${location.pathname === item.path
                       ? 'text-blue-400'
                       : 'text-slate-300 hover:text-white'
-                  }`}
+                    }`}
                 >
                   {item.label}
                 </Link>
@@ -46,7 +53,7 @@ export function Layout() {
                 to="/login"
                 className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors"
               >
-                Login
+                {user?.id == null ? "Login" : "Dashboard"}
               </Link>
             </div>
 
@@ -73,11 +80,10 @@ export function Layout() {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`text-sm font-medium transition-colors ${
-                      location.pathname === item.path
+                    className={`text-sm font-medium transition-colors ${location.pathname === item.path
                         ? 'text-blue-400'
                         : 'text-slate-300 hover:text-white'
-                    }`}
+                      }`}
                   >
                     {item.label}
                   </Link>
@@ -87,7 +93,7 @@ export function Layout() {
                   onClick={() => setIsMenuOpen(false)}
                   className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors text-center"
                 >
-                  Login
+                  {user?.id == null ? "Login" : "Dashboard"}
                 </Link>
               </div>
             </motion.div>
@@ -103,10 +109,9 @@ export function Layout() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2">
-              <Wallet className="w-6 h-6 text-blue-400" />
-              <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Starkord
-              </span>
+            <Link to="/" className="flex items-center space-x-2">
+              <img src={logo} alt="logo" className="w-24 md:w-32" />
+            </Link>
             </div>
             <div className="flex items-center space-x-6">
               {navItems.map((item) => (
@@ -128,3 +133,5 @@ export function Layout() {
     </div>
   );
 }
+
+

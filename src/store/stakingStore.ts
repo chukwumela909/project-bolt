@@ -26,12 +26,15 @@ interface Stake {
 interface StakingState {
   stakes: Stake[] | null;
   loadingStakes: boolean;
+  loadingAddress: boolean;
+  deposit_address: string | null;
   error: string | null;
   fetchStakes: () => Promise<void>;
+  getDepositAddress: (plan: string) => Promise<void>;
+
   // createStake: (plan: string, amount: number, dailyYield: number) => Promise<string>;
   // restake: (stakeId: string) => Promise<void>;
   // unstake: (stakeId: string) => Promise<void>;
-  // getDepositAddress: (plan: string) => Promise<string>;
   // initiateWithdrawal: (stakeId: string, amount: number, address: string) => Promise<void>;
 }
 
@@ -40,6 +43,8 @@ interface StakingState {
 const useStakingStore = create<StakingState>((set) => ({
   stakes: null,
   loadingStakes: false,
+  loadingAddress: false,
+  deposit_address: null,
   error: null,
 
   fetchStakes: async () => {
@@ -67,7 +72,7 @@ const useStakingStore = create<StakingState>((set) => ({
       console.log(data);
       set({ stakes: data['stakes'] });
     } catch (error) {
-      console.error('Fetch user data error:', error);
+      console.error('Fetch stakes error:', error);
       if (axios.isAxiosError(error) && error.response) {
         set({ error: error.response.data });
       } else {
@@ -78,22 +83,44 @@ const useStakingStore = create<StakingState>((set) => ({
     }
   },
 
-  // getDepositAddress: async (plan: string): Promise<string> => {
-  //   try {
-  //     const { data: { user } } = await supabase.auth.getUser();
-  //     if (!user) throw new Error('User not authenticated');
+  getDepositAddress: async (plan: string): Promise<void> => {
+    set({ loadingAddress: true });
+    try {
+      const token = localStorage.getItem('auth-token');
+      console.log(token);
+      if (!token) {
+        console.log("No auth token found")
+        throw new Error('No auth token found');
+      }
+      const response = await axios.post("https://stake.betpaddi.com/api/investment/stake.php", {
+        token: token,
+        plan_id: plan
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
 
-  //     const address = await walletCoreService.generateDepositAddress(user.id, plan);
-  //     if (!address || !ethers.isAddress(address)) {
-  //       throw new Error('Invalid deposit address received');
-  //     }
+      console.log(response);
 
-  //     return address;
-  //   } catch (error) {
-  //     console.error('Error in getDepositAddress:', error);
-  //     throw error;
-  //   }
-  // },
+      if (response.status !== 200) throw new Error('Failed to generate deposit address');
+      const data = response.data;
+      console.log(data);
+      set({ deposit_address: data['deposit_address'] });
+    } catch (error) {
+      console.error('Fetch stakes error:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        set({ error: error.response.data });
+      } else {
+        set({ error: String(error) });
+        throw error;
+      }
+    } finally {
+      set({ loadingAddress: false });
+      return 
+    }
+  },
 
   // createStake: async (plan: string, amount: number, dailyYield: number) => {
   //   set({ loadingStakes: true });
