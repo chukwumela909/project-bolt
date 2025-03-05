@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Wallet, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useUserStore } from '../store/userStore';
 import logo from '../../images/starkordMainLogo.png';
 

@@ -318,9 +318,12 @@ function Dashboard() {
                 <LogOut className="w-4 h-4 mr-2" />
                 <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
               </motion.button>
+              
             </div>
+            
           </div>
         </div>
+        
 
         {ethPriceLoading && (
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex items-center space-x-3">
@@ -520,7 +523,7 @@ function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
             {plans?.map(plan => {
-              const isGeneratingAddress = actionLoading === `generating_address_${plan.name}`;
+              // const isGeneratingAddress = actionLoading === `generating_address_${plan.name}`;
 
               return (
                 <motion.div
