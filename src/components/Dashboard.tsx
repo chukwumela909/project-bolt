@@ -69,7 +69,7 @@ function Dashboard() {
   } = useStakingStore();
 
 
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  // const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [ethPrice, setEthPrice] = useState<number>(0);
   const [ethPriceLoading, setEthPriceLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -429,7 +429,7 @@ function Dashboard() {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               // onClick={() => handleRestake(stake.id)}
-                              disabled={actionLoading === stake.id + '_restake'}
+                              // disabled={actionLoading === stake.id + '_restake'}
                               className="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center space-x-2 text-sm hover:bg-green-600 transition-colors disabled:opacity-50"
                             >
                               <RefreshCw className="w-4 h-4" />

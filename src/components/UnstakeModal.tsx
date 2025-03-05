@@ -39,7 +39,7 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
   const [walletAddress, setwalletAddress] = useState('');
   const [error, setError] = useState('');
 
-  const {unstake, loadingUnstake, fetchStakes} = useStakingStore();
+  const {unstake, loadingUnstake} = useStakingStore();
 
 
   

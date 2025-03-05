@@ -26,7 +26,7 @@ interface AuthState {
   setUser: (user: User | null) => void;
   setLoading: (loading: boolean) => void;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string, country: string, phone: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string, country: string,referred_by: string, phone: string) => Promise<void>;
   forgotPassword: (email: string,) => Promise<void>;
   updateProfile: ( name: string, country: string, phone: string) => Promise<void>;
   changePassword: ( password: string,) => Promise<void>;
@@ -73,7 +73,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  signUp: async (email, password, name, country, phone) => {
+  signUp: async (email, password, name, country, referred_by, phone) => {
 
     try {
 
@@ -82,6 +82,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         password,
         name,
         country,
+        referred_by,
         phone
       }, {
         headers: {
