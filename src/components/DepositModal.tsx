@@ -63,7 +63,7 @@ export function DepositModal({ isOpen, onClose, depositAddress, minAmount, ethPr
               <div>
                 <label className="block text-sm font-medium mb-2">Deposit Address</label>
                 <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4 break-all font-mono">
-                  {depositAddress}
+                  {depositAddress ? depositAddress : 'Loading...'}
                 </div>
               </div>
 

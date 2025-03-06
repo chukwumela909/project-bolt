@@ -77,14 +77,19 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     try {
 
-      const response = await axios.post("https://stake.betpaddi.com/api/auth/register.php", {
+      const payload: any = {
         email,
         password,
         name,
         country,
-        referred_by,
         phone
-      }, {
+      };
+
+      if (referred_by) {
+        payload.referred_by = referred_by;
+      }
+
+      const response = await axios.post("https://stake.betpaddi.com/api/auth/register.php", payload, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

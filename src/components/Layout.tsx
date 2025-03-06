@@ -2,13 +2,13 @@ import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
-import { useUserStore } from '../store/userStore';
+// import { useUserStore } from '../store/userStore';
 import logo from '../../images/starkordMainLogo.png';
 
 
 
 export function Layout() {
-  const { user} = useUserStore();
+  // const { user} = useUserStore();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const location = useLocation();
 
@@ -53,7 +53,7 @@ export function Layout() {
                 to="/login"
                 className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors"
               >
-                {user?.id == null ? "Login" : "Dashboard"}
+                {"Login"}
               </Link>
             </div>
 
@@ -93,7 +93,7 @@ export function Layout() {
                   onClick={() => setIsMenuOpen(false)}
                   className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors text-center"
                 >
-                  {user?.id == null ? "Login" : "Dashboard"}
+                  {"Login"}
                 </Link>
               </div>
             </motion.div>
