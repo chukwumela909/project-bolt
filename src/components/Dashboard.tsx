@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useUserStore } from '../store/userStore';
 import { useStakingStore } from '../store/stakingStore';
-import { useReferralStore } from '../store/referralStore';
 import { UnstakeModal } from './UnstakeModal';
 import { DepositModal } from './DepositModal';
 import { ReferralStats } from './ReferralStats';
@@ -21,8 +20,8 @@ import {
   AlertCircle,
   User,
   Home,
-  Wallet2
 } from 'lucide-react';
+import { WithdrawModal } from './WithdrawModal';
 
 
 
@@ -77,16 +76,14 @@ function Dashboard() {
   // const [selectedStake, setSelectedStake] = useState<string | null>(null);
   const [unstakeModalOpen, setUnstakeModalOpen] = useState(false);
   const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const [withdrawrefModalOpen, setWithdrawrefModalOpen] = useState(false);
   const [selectedUnstake, setSelectedUnstake] = useState<any>(null);
   const [depositAddress, setDepositAddress] = useState<string>('');
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [ethPriceError, setEthPriceError] = useState<boolean>(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const {
-    fetchReferralStats,
-    generateReferralCode,
-  } = useReferralStore();
+
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -106,8 +103,6 @@ function Dashboard() {
     getInvestmentPlans();
     fetchStakes();
     fetchEthPrice();
-    fetchReferralStats();
-    generateReferralCode();
 
 
 
@@ -116,7 +111,6 @@ function Dashboard() {
       getInvestmentPlans();
       fetchStakes();
       fetchEthPrice();
-      fetchReferralStats();
       setLastUpdate(new Date());
     }, 5 * 60 * 1000);
 
@@ -167,10 +161,10 @@ function Dashboard() {
     try {
       setSelectedPlan({ name: plan, minStake });
       console.log(`Selected plan: ${plan}, ${planId}, ${minStake}`);
-     await getDepositAddress(planId);
-     if (deposit_address) {
-       setDepositAddress(deposit_address);
-     }
+      await getDepositAddress(planId);
+      if (deposit_address) {
+        setDepositAddress(deposit_address);
+      }
 
       setDepositModalOpen(true);
     } catch (error) {
@@ -199,6 +193,12 @@ function Dashboard() {
   const handleUnstakeClick = (stake: any) => {
     setSelectedUnstake(stake);
     setUnstakeModalOpen(true);
+  };
+
+  const handleWithdrawRefClick = () => {
+    // setSelectedUnstake(stake);
+    console.log("withdraw ref clicked")
+    setWithdrawrefModalOpen(true);
   };
 
   //  const handleUnstakeConfirm = async (id: string, walletAddress: string, unstakeAmount:string) => {
@@ -333,7 +333,7 @@ function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-colors">
             <div className="flex items-start justify-between">
@@ -344,7 +344,7 @@ function Dashboard() {
               </div>
               <div className="bg-blue-500/20 p-2 rounded-lg">
                 <Wallet className="w-6 h-6 text-blue-400" />
-              </div>
+              </div>  
             </div>
           </div>
 
@@ -386,30 +386,30 @@ function Dashboard() {
               </div>
             </div>
           </div>
-          <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-colors">
+          {/* <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-colors">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-400">Referral earnings</p>
                 <p className="text-2xl font-bold text-blue-400">{Number(user.earnings).toFixed(4)} ETH</p>
                 <p className="text-sm text-blue-500">≈ ${(Number(user.earnings) * ethPrice).toLocaleString()}</p>
-                
+
               </div>
               <div className="bg-blue-500/20 p-2 rounded-lg">
                 <Wallet2 className="w-6 h-6 text-green-400" />
-                
+
               </div>
-              
+
             </div>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate('/withdraw')}
+              onClick={() => handleWithdrawRefClick()}
               className="w-full mt-2 bg-green-500 hover:bg-yellow-600 backdrop-blur-sm px-4 py-2 rounded-lg transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <DollarSign className="w-4 h-4 mr-2" />
               Withdraw
-            </motion.button>
-          </div>
+            </motion.button>            
+          </div> */}
         </motion.div>
 
         <motion.div
@@ -521,6 +521,7 @@ function Dashboard() {
         <ReferralStats
           referralCode={user.referral_code}
           totalReferrals={Number(user.total_referrals)}
+          handleWithdraw={handleWithdrawRefClick}
           activeReferrals={Number(user.active_referrals)}
           referralRewards={user.referral_rewards}
           ethPrice={ethPrice}
@@ -570,9 +571,9 @@ function Dashboard() {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={async () =>  {
-                    await  handleStake(plan.name, plan.id, Number(plan.min_amount),)
-                    } }
+                    onClick={async () => {
+                      await handleStake(plan.name, plan.id, Number(plan.min_amount),)
+                    }}
                     disabled={loadingAddress}
                     className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm py-3 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -614,6 +615,17 @@ function Dashboard() {
         depositAddress={deposit_address!}
         minAmount={selectedPlan?.minStake || 0}
         ethPrice={ethPrice}
+      />
+
+      <WithdrawModal
+        isOpen={withdrawrefModalOpen}
+        ethPrice={ethPrice}
+        balance={Number(user.earnings)}
+        onClose={() => {
+          setWithdrawrefModalOpen(false);
+          
+        }}
+
       />
     </div>
   );

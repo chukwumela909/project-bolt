@@ -1,15 +1,17 @@
 import  { useState } from 'react';
-import { Users, Award, TrendingUp, CheckCircle2, Copy, AlertCircle } from 'lucide-react';
+import { Users, Award, TrendingUp, CheckCircle2, Copy, AlertCircle, DollarSign } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface ReferralStatsProps {
   referralCode: string;
+  handleWithdraw: () => void;
   totalReferrals: number;
   activeReferrals: number;
   referralRewards: number;
   ethPrice: number;
 }
 
-export function ReferralStats({ referralCode, totalReferrals, activeReferrals, referralRewards, ethPrice }: ReferralStatsProps) {
+export function ReferralStats({ referralCode, totalReferrals, handleWithdraw, activeReferrals, referralRewards, ethPrice }: ReferralStatsProps) {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const referralLink = `${window.location.origin}?ref=${referralCode}`;
@@ -36,8 +38,8 @@ export function ReferralStats({ referralCode, totalReferrals, activeReferrals, r
             <span className="text-sm text-slate-400">Your Code:</span>
             <span className="font-mono font-bold">{referralCode}</span>
           </div>
-          <button
-            onClick={() => copyToClipboard}
+          {/* <button
+            onClick={copyToClipboard}
             className={`px-4 py-2 ${
               copied ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'
             } text-white rounded-lg flex items-center space-x-2 text-sm transition-colors w-full sm:w-auto justify-center`}
@@ -53,7 +55,25 @@ export function ReferralStats({ referralCode, totalReferrals, activeReferrals, r
                 <span>Copy Referral Link</span>
               </>
             )}
-          </button>
+          </button> */}
+          <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => copyToClipboard()}
+              className=" mt-2 bg-blue-500 hover:bg-yellow-600 backdrop-blur-sm px-4 py-2 rounded-lg transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {copied ? (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4" />
+                <span>Copy Referral Link</span>
+              </>
+            )}
+            </motion.button> 
         </div>
       </div>
 
@@ -94,15 +114,26 @@ export function ReferralStats({ referralCode, totalReferrals, activeReferrals, r
         <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-colors">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-400">Referral Rewards</p>
+              <p className="text-sm font-medium text-slate-400"> Total Referral Rewards</p>
               <p className="text-2xl font-bold mt-2 text-blue-400">{referralRewards.toFixed(4)} ETH</p>
               <p className="text-sm text-blue-500">≈ ${(referralRewards * ethPrice).toLocaleString()}</p>
             </div>
             <div className="bg-blue-500/20 p-2 rounded-lg">
               <TrendingUp className="w-6 h-6 text-blue-400" />
             </div>
+           
           </div>
+          <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleWithdraw()}
+              className="w-full mt-2 bg-green-500 hover:bg-yellow-600 backdrop-blur-sm px-4 py-2 rounded-lg transition-all flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <DollarSign className="w-4 h-4 mr-2" />
+              Withdraw
+            </motion.button> 
         </div>
+        
       </div>
 
       <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50">

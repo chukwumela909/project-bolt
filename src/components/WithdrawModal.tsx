@@ -1,36 +1,47 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, X, Wallet } from 'lucide-react';
+import { useReferralStore } from '../store/referralStore';
+import { useEffect } from 'react';
 
 interface WithdrawModalProps {
   isOpen: boolean;
+  balance: number;
   onClose: () => void;
-  onConfirm: (amount: number, address: string) => Promise<void>;
-  stake: {
-    amount: number;
-    total_earned: number;
-  };
   ethPrice: number;
 }
 
-export function WithdrawModal({ isOpen, onClose, onConfirm, stake, ethPrice }: WithdrawModalProps) {
-  const [amount, setAmount] = useState<number>(0);
+export function WithdrawModal({ isOpen, balance, onClose, ethPrice }: WithdrawModalProps) {
+  const [amount, setAmount] = useState<string>('');
   const [address, setAddress] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const {
+    withdraw, withdrawerror,
+  } = useReferralStore();
 
-  const maxAmount = stake.amount + stake.total_earned;
+  useEffect(() => {
+    if (withdrawerror) {
+      setError(withdrawerror);
+      setAmount('');
+      setAddress('');
+    }
+  }, [withdrawerror]);
+
+  
+
+  const maxAmount = balance;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!amount || amount <= 0) {
+    if (!amount || Number(amount) <= 0) {
       setError('Please enter a valid amount');
       return;
     }
 
-    if (amount > maxAmount) {
+    if (Number(amount) > maxAmount) {
       setError('Amount exceeds available balance');
       return;
     }
@@ -42,9 +53,17 @@ export function WithdrawModal({ isOpen, onClose, onConfirm, stake, ethPrice }: W
 
     try {
       setIsLoading(true);
-      await onConfirm(amount, address);
-      onClose();
+      await withdraw(amount.toString(), address);
+      if (withdrawerror) {
+        setTimeout(() => {
+          setError(withdrawerror);
+          setAmount('');
+          setAddress('');
+        }, 2000);
+      }
+      // onClose();
     } catch (err) {
+      console.log("the" + err)
       setError((err as Error).message);
     } finally {
       setIsLoading(false);
@@ -59,7 +78,10 @@ export function WithdrawModal({ isOpen, onClose, onConfirm, stake, ethPrice }: W
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={() => {
+              setError('');
+              onClose();
+              }}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
           
@@ -71,7 +93,10 @@ export function WithdrawModal({ isOpen, onClose, onConfirm, stake, ethPrice }: W
           >
             <div className="absolute top-4 right-4">
               <button
-                onClick={onClose}
+                 onClick={() => {
+                  setError('');
+                  onClose();
+                  }}
                 className="text-slate-400 hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -98,10 +123,10 @@ export function WithdrawModal({ isOpen, onClose, onConfirm, stake, ethPrice }: W
                 </label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
                     id="amount"
                     value={amount}
-                    onChange={(e) => setAmount(Number(e.target.value))}
+                    onChange={(e) => setAmount(e.target.value)}
                     step="0.0001"
                     min="0"
                     max={maxAmount}
@@ -126,7 +151,7 @@ export function WithdrawModal({ isOpen, onClose, onConfirm, stake, ethPrice }: W
                 />
               </div>
 
-              {error && (
+              {error &&  (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-sm text-red-400 flex items-center space-x-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{error}</span>
@@ -138,7 +163,10 @@ export function WithdrawModal({ isOpen, onClose, onConfirm, stake, ethPrice }: W
                   type="button"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={onClose}
+                  onClick={() => {
+                  setError('');
+                  onClose();
+                  }}
                   className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
                 >
                   Cancel
