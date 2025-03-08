@@ -20,6 +20,7 @@ import {
   AlertCircle,
   User,
   Home,
+
 } from 'lucide-react';
 import { WithdrawModal } from './WithdrawModal';
 
@@ -248,7 +249,7 @@ function Dashboard() {
 
   if (!user) {
     return <div className="flex flex-col items-center justify-center min-h-screen text-center space-y-4">
-      <p className="text-xl font-semibold text-slate-400">No user data available.</p>
+      <p className="text-xl font-semibold text-slate-400">Oops, Session Expired.</p>
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}

@@ -114,7 +114,7 @@ export function ReferralStats({ referralCode, totalReferrals, handleWithdraw, ac
         <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-colors">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-400"> Total Referral Rewards</p>
+              <p className="text-sm font-medium text-slate-400"> Referral Rewards</p>
               <p className="text-2xl font-bold mt-2 text-blue-400">{referralRewards.toFixed(4)} ETH</p>
               <p className="text-sm text-blue-500">≈ ${(referralRewards * ethPrice).toLocaleString()}</p>
             </div>

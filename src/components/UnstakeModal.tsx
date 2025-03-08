@@ -35,7 +35,7 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
 
   const penaltyPercentage = Number(stake.penalty); // 10% penalty for early withdrawal
   const feePercentage = 5; // 10% penalty for early withdrawal
-  const [unstakeAmount, setUnstakeAmount] = useState(0);
+  const [unstakeAmount, setUnstakeAmount] = useState('');
   const [walletAddress, setwalletAddress] = useState('');
   const [error, setError] = useState('');
 
@@ -45,15 +45,15 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
   
 
   const handleUnstakeAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUnstakeAmount(Number(e.target.value));
+    setUnstakeAmount(e.target.value);
   };
   const handleWalletAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setwalletAddress(e.target.value);
   };
 
-  const penaltyAmount = unstakeAmount * (penaltyPercentage / 100);
-  const feeAmount = unstakeAmount * (feePercentage / 100);
-  const finalAmount = unstakeAmount - penaltyAmount - feeAmount;
+  const penaltyAmount = Number(unstakeAmount) * (penaltyPercentage / 100);
+  const feeAmount = Number(unstakeAmount) * (feePercentage / 100);
+  const finalAmount = Number(unstakeAmount) - penaltyAmount - feeAmount;
 
     const handleUnstakeConfirm = async (id: string, walletAddress: string, unstakeAmount:string) => {
     
@@ -86,7 +86,10 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={() => {
+              setError('');
+              onClose();
+              }}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
           <motion.div
@@ -97,7 +100,10 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
           >
             <div className="absolute top-4 right-4">
               <button
-                onClick={onClose}
+                 onClick={() => {
+                  setError('');
+                  onClose();
+                  }}
                 className="text-slate-400 hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -183,7 +189,10 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={onClose}
+                  onClick={() => {
+                    setError('');
+                    onClose();
+                    }}
                   className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
                 >
                   Cancel
