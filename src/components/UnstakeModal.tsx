@@ -160,11 +160,11 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
                   </div>
                 </div>
               </div>
-              <div className="bg-amber-400/10 border border-amber-400/20 rounded-lg p-4">
+              {/* <div className="bg-amber-400/10 border border-amber-400/20 rounded-lg p-4">
                 <p className="text-sm text-amber-400">
                   <strong>Note:</strong> By unstaking early, you'll incur a {penaltyPercentage}% penalty on your original stake. Consider restaking instead to maintain your earning potential.
                 </p>
-              </div>
+              </div> */}
               <div className="space-y-4">
                 <label className="block text-slate-400">Amount to Unstake (ETH)</label>
                 <input
