@@ -36,9 +36,10 @@ export function RestakeModal({ isOpen, stakeID, onClose }: RestakeModalProps) {
         setError('');
         setIsLoading(true);
         try {
-            await restake(stakeID);
-            if (restakeError) {
-               showToast(restakeError, 'error');
+          const result =  await restake(stakeID);
+          const currentError = useStakingStore.getState().restakeError
+            if (!result) {
+               showToast(currentError || "Failed to restake", "error");
             } else {
                 showToast('Restake successful. Earnings have been added to stake amount.', 'success');
                 onClose();

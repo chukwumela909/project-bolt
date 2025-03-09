@@ -175,7 +175,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   resetPassword: async (newPassword) => {
     try {
-      const response = await axios.post("https://stake.betpaddi.com/api/auth/forgot-password.php", {
+      const response = await axios.post("https://stake.betpaddi.com/api/auth/reset-password.php", {
+        reset_token: 
         newPassword
       }, {
         headers: {

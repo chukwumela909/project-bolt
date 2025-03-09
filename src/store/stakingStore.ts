@@ -36,7 +36,7 @@ interface StakingState {
   fetchStakes: () => Promise<void>;
   getDepositAddress: (plan: string) => Promise<void>;
   restake: (stakeId: string) => Promise<boolean>;
-  unstake: (stake_id: string, wallet_address: string, unstake_amount: string) => Promise<void>;
+  unstake: (stake_id: string, wallet_address: string, unstake_amount: string) => Promise<boolean>;
 
   // createStake: (plan: string, amount: number, dailyYield: number) => Promise<string>;
   // restake: (stakeId: string) => Promise<void>;
@@ -132,14 +132,14 @@ const useStakingStore = create<StakingState>((set) => ({
     }
   },
 
-  unstake: async (stake_id: string, wallet_address: string, unstake_amount: string): Promise<void> => {
-    set({ loadingUnstake: true });
+  unstake: async (stake_id: string, wallet_address: string, unstake_amount: string): Promise<boolean> => {
+    set({ loadingUnstake: true, unstakeError: null });
     try {
       const token = localStorage.getItem('auth-token');
-      console.log(token);
+
       if (!token) {
-        console.log("No auth token found")
-        throw new Error('No auth token found');
+        set({ restakeError: "No auth token found" })
+        return false;
       }
       const response = await axios.post("https://stake.betpaddi.com/api/investment/unstake.php", {
         token: token,
@@ -153,46 +153,22 @@ const useStakingStore = create<StakingState>((set) => ({
         },
       });
 
-      console.log(response);
-      console.log({
-        token: token,
-        stake_id: stake_id,
-        wallet_address: wallet_address,
-      })
 
+      if (response.status !== 200) throw new Error('Failed to restake');
 
+      return true;
 
-      if (response.status !== 200) throw new Error('Failed to unstake');
-      const data = response.data;
-      console.log(data.message);
-      // if (true) {
-      //   const alertMessage = document.createElement('div');
-      //   alertMessage.textContent = response.data.message;
-      //   alertMessage.style.position = 'fixed';
-      //   alertMessage.style.top = '50%';
-      //   alertMessage.style.left = '50%';
-      //   alertMessage.style.transform = 'translate(-50%, -50%)';
-      //   alertMessage.style.backgroundColor = 'green';
-      //   alertMessage.style.color = 'white';
-      //   alertMessage.style.padding = '10px';
-      //   alertMessage.style.borderRadius = '5px';
-      //   document.body.appendChild(alertMessage);
-
-      //   setTimeout(() => {
-      //     document.body.removeChild(alertMessage);
-      //   }, 3000);
-      // }
     } catch (error) {
       console.error('unstake error:', error);
       if (axios.isAxiosError(error) && error.response) {
-        set({ unstakeError: error.response.data.error });
+        set({ unstakeError: error.response.data.error || "Failed to unstake" });
       } else {
         set({ unstakeError: String(error) });
         throw error;
       }
+      return false
     } finally {
       set({ loadingUnstake: false });
-      return
     }
   },
 
@@ -219,8 +195,10 @@ const useStakingStore = create<StakingState>((set) => ({
       });
 
 
-      if (response.status !== 200) throw new Error('Failed to unstake');
-
+      if (response.status !== 200){
+        set({ restakeError: "Failed to restake" })
+        return false;
+      }
 
       return true;
 

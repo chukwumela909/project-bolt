@@ -2,8 +2,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, AlertTriangle, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import useStakingStore from '../store/stakingStore';
+import { useToast } from './Toast';
+
 
 
 interface UnstakeModalProps {
@@ -21,7 +22,7 @@ interface UnstakeModalProps {
 }
 
 export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalProps) {
-  const navigate = useNavigate();
+
 
   const daysRemaining = Math.max(
     0,
@@ -37,9 +38,19 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
   const feePercentage = 5; // 10% penalty for early withdrawal
   const [unstakeAmount, setUnstakeAmount] = useState('');
   const [walletAddress, setwalletAddress] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
   const [error, setError] = useState('');
 
-  const { unstake, loadingUnstake, unstakeError } = useStakingStore();
+  const { unstake,  unstakeError } = useStakingStore();
+
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (!isOpen) {
+      setError('');
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (unstakeError) {
@@ -62,8 +73,10 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
   const finalAmount = Number(unstakeAmount) - penaltyAmount - feeAmount;
 
   const handleUnstakeConfirm = async (id: string, walletAddress: string, unstakeAmount: string) => {
-
+    setError('');
+    setIsLoading(true);
     try {
+
       if (Number(unstakeAmount) <= 0) {
         setError('Please enter a valid unstake amount.');
         return;
@@ -74,41 +87,21 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
         setError('Please enter a valid Ethereum wallet address.');
         return;
       }
-      await unstake(id, walletAddress, unstakeAmount.toString());
-      if (unstakeError) {
-        setTimeout(() => {
-          setError(unstakeError);
-          setUnstakeAmount('');
-          setwalletAddress('');
-        }, 2000);
+
+     const result = await unstake(id, walletAddress, unstakeAmount.toString());
+     const currentError = useStakingStore.getState().unstakeError
+      if (!result) {
+        showToast(currentError || "Failed to unstake", "error");
+      } else {
+        showToast('Unstake successful. Earnings have been added to your wallet.', 'success');
+        onClose();
       }
 
-      if (error == null) {
-        const alertMessage = document.createElement('div');
-        alertMessage.textContent = "Unstake successful";
-        alertMessage.style.position = 'fixed';
-        alertMessage.style.top = '50%';
-        alertMessage.style.left = '50%';
-        alertMessage.style.transform = 'translate(-50%, -50%)';
-        alertMessage.style.backgroundColor = 'green';
-        alertMessage.style.color = 'white';
-        alertMessage.style.padding = '10px';
-        alertMessage.style.borderRadius = '5px';
-        alertMessage.style.zIndex = '1000';
-        document.body.appendChild(alertMessage);
-
-        setTimeout(() => {
-          document.body.removeChild(alertMessage);
-        }, 3000);
-        navigate('/dashboard')
-
-      }
-
-      // await fetchStakes();
-      navigate('/dashboard')
     } catch (error) {
       console.error('Unstake error:', error);
+      showToast(String(error), 'error');
     } finally {
+      setIsLoading(false);
     }
 
   };
@@ -232,7 +225,7 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
                 >
                   Cancel
                 </motion.button>
-                {loadingUnstake ? (
+                {isLoading ? (
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
