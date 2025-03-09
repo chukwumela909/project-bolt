@@ -14,13 +14,13 @@ interface ReferralStatsProps {
 export function ReferralStats({ referralCode, totalReferrals, handleWithdraw, activeReferrals, referralRewards, ethPrice }: ReferralStatsProps) {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const referralLink = `${window.location.origin}?ref=${referralCode}`;
+  // const referralLink = `${window.location.origin}?ref=${referralCode}`;
 
   const copyToClipboard = () => {
-    console.log('Copying referral link:', referralLink);
+    console.log('Copying referral link:', referralCode);
     setError(null);
     
-    navigator.clipboard.writeText(referralLink).then(() => {
+    navigator.clipboard.writeText(referralCode).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }).catch(err => {

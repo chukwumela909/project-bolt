@@ -1,7 +1,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, AlertTriangle, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useStakingStore from '../store/stakingStore';
 
@@ -31,7 +31,7 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
   )
 
 
-  
+
 
   const penaltyPercentage = Number(stake.penalty); // 10% penalty for early withdrawal
   const feePercentage = 5; // 10% penalty for early withdrawal
@@ -39,10 +39,16 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
   const [walletAddress, setwalletAddress] = useState('');
   const [error, setError] = useState('');
 
-  const {unstake, loadingUnstake} = useStakingStore();
+  const { unstake, loadingUnstake, unstakeError } = useStakingStore();
 
+  useEffect(() => {
+    if (unstakeError) {
+      setError(unstakeError);
+      setUnstakeAmount('');
+      setwalletAddress('');
+    }
+  }, [unstakeError]);
 
-  
 
   const handleUnstakeAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUnstakeAmount(e.target.value);
@@ -55,27 +61,56 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
   const feeAmount = Number(unstakeAmount) * (feePercentage / 100);
   const finalAmount = Number(unstakeAmount) - penaltyAmount - feeAmount;
 
-    const handleUnstakeConfirm = async (id: string, walletAddress: string, unstakeAmount:string) => {
-    
-      try {
-        if (Number(unstakeAmount) <= 0) {
-          setError('Please enter a valid unstake amount.');
-          return;
-        }
+  const handleUnstakeConfirm = async (id: string, walletAddress: string, unstakeAmount: string) => {
 
-        const walletAddressRegex = /^0x[a-fA-F0-9]{40}$/;
-        if (!walletAddressRegex.test(walletAddress)) {
-          setError('Please enter a valid Ethereum wallet address.');
-          return;
-        }
-       unstake(id, walletAddress, unstakeAmount.toString());
-        // await fetchStakes();
-        navigate('/dashboard')
-      } catch (error) {
-        console.error('Unstake error:', error);
-      } finally {
+    try {
+      if (Number(unstakeAmount) <= 0) {
+        setError('Please enter a valid unstake amount.');
+        return;
       }
-   
+
+      const walletAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+      if (!walletAddressRegex.test(walletAddress)) {
+        setError('Please enter a valid Ethereum wallet address.');
+        return;
+      }
+      await unstake(id, walletAddress, unstakeAmount.toString());
+      if (unstakeError) {
+        setTimeout(() => {
+          setError(unstakeError);
+          setUnstakeAmount('');
+          setwalletAddress('');
+        }, 2000);
+      }
+
+      if (error == null) {
+        const alertMessage = document.createElement('div');
+        alertMessage.textContent = "Unstake successful";
+        alertMessage.style.position = 'fixed';
+        alertMessage.style.top = '50%';
+        alertMessage.style.left = '50%';
+        alertMessage.style.transform = 'translate(-50%, -50%)';
+        alertMessage.style.backgroundColor = 'green';
+        alertMessage.style.color = 'white';
+        alertMessage.style.padding = '10px';
+        alertMessage.style.borderRadius = '5px';
+        alertMessage.style.zIndex = '1000';
+        document.body.appendChild(alertMessage);
+
+        setTimeout(() => {
+          document.body.removeChild(alertMessage);
+        }, 3000);
+      navigate('/dashboard')
+
+      }
+
+      // await fetchStakes();
+      navigate('/dashboard')
+    } catch (error) {
+      console.error('Unstake error:', error);
+    } finally {
+    }
+
   };
 
   return (
@@ -89,7 +124,7 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
             onClick={() => {
               setError('');
               onClose();
-              }}
+            }}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
           <motion.div
@@ -100,10 +135,10 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
           >
             <div className="absolute top-4 right-4">
               <button
-                 onClick={() => {
+                onClick={() => {
                   setError('');
                   onClose();
-                  }}
+                }}
                 className="text-slate-400 hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -180,11 +215,11 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
                   className="w-full p-2 bg-slate-700 text-white rounded-lg" />
               </div>
               {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-sm text-red-400 flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-sm text-red-400 flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
               <div className="flex space-x-3 pt-4">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -192,7 +227,7 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
                   onClick={() => {
                     setError('');
                     onClose();
-                    }}
+                  }}
                   className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
                 >
                   Cancel
@@ -210,7 +245,10 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => handleUnstakeConfirm(stake.id, walletAddress, unstakeAmount.toString())}
+                    onClick={() => {
+                      setError('')
+                      handleUnstakeConfirm(stake.id, walletAddress, unstakeAmount.toString())
+                    }}
                     className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
                   >
                     Confirm Unstake

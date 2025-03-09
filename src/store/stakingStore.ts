@@ -28,10 +28,14 @@ interface StakingState {
   loadingStakes: boolean;
   loadingAddress: boolean;
   loadingUnstake: boolean;
+  loadingRestake: boolean;
   deposit_address: string | null;
   error: string | null;
+  unstakeError: string | null
+  restakeError: string | null
   fetchStakes: () => Promise<void>;
   getDepositAddress: (plan: string) => Promise<void>;
+  restake: (stakeId: string) => Promise<void>;
   unstake: (stake_id: string, wallet_address: string, unstake_amount: string) => Promise<void>;
 
   // createStake: (plan: string, amount: number, dailyYield: number) => Promise<string>;
@@ -47,8 +51,11 @@ const useStakingStore = create<StakingState>((set) => ({
   loadingStakes: false,
   loadingAddress: false,
   loadingUnstake: false,
+  loadingRestake: false,
   deposit_address: null,
   error: null,
+  unstakeError: null,
+  restakeError: null,
 
   fetchStakes: async () => {
     set({ loadingStakes: true });
@@ -147,16 +154,40 @@ const useStakingStore = create<StakingState>((set) => ({
       });
 
       console.log(response);
+      console.log({
+        token: token,
+        stake_id: stake_id,
+        wallet_address: wallet_address,
+      })
+
+     
 
       if (response.status !== 200) throw new Error('Failed to unstake');
       const data = response.data;
-      console.log(data);
+      console.log(data.message);
+      // if (true) {
+      //   const alertMessage = document.createElement('div');
+      //   alertMessage.textContent = response.data.message;
+      //   alertMessage.style.position = 'fixed';
+      //   alertMessage.style.top = '50%';
+      //   alertMessage.style.left = '50%';
+      //   alertMessage.style.transform = 'translate(-50%, -50%)';
+      //   alertMessage.style.backgroundColor = 'green';
+      //   alertMessage.style.color = 'white';
+      //   alertMessage.style.padding = '10px';
+      //   alertMessage.style.borderRadius = '5px';
+      //   document.body.appendChild(alertMessage);
+
+      //   setTimeout(() => {
+      //     document.body.removeChild(alertMessage);
+      //   }, 3000);
+      // }
     } catch (error) {
       console.error('unstake error:', error);
       if (axios.isAxiosError(error) && error.response) {
-        set({ error: error.response.data });
+        set({ unstakeError: error.response.data.error });
       } else {
-        set({ error: String(error) });
+        set({ unstakeError: String(error) });
         throw error;
       }
     } finally {
@@ -165,69 +196,47 @@ const useStakingStore = create<StakingState>((set) => ({
     }
   },
 
-  // createStake: async (plan: string, amount: number, dailyYield: number) => {
-  //   set({ loadingStakes: true });
-  //   try {
-  //     const { data: { user } } = await supabase.auth.getUser();
-  //     if (!user) throw new Error('User not authenticated');
 
-  //     const depositAddress = await walletCoreService.generateDepositAddress(user.id, plan);
 
-  //     // For demo, immediately create an active stake
-  //     const newStake: Stake = {
-  //       id: Date.now().toString(),
-  //       plan,
-  //       amount,
-  //       daily_yield: dailyYield,
-  //       status: 'active',
-  //       start_date: new Date().toISOString(),
-  //       end_date: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
-  //       total_earned: 0,
-  //       last_payout: new Date().toISOString(),
-  //       deposit_address: depositAddress
-  //     };
+  restake: async (stakeId: string) => {
+    set({ loadingRestake: true });
+    try {
+      const token = localStorage.getItem('auth-token');
+      console.log(token);
+      if (!token) {
+        console.log("No auth token found")
+        throw new Error('No auth token found');
+      }
 
-  //     set(state => ({
-  //       stakes: [...state.stakes, newStake]
-  //     }));
+      console.log(stakeId);
 
-  //     return depositAddress;
-  //   } catch (error) {
-  //     console.error('Error creating stake:', error);
-  //     throw error;
-  //   } finally {
-  //     set({ loadingStakes: false });
-  //   }
-  // },
+      const response = await axios.post("https://stake.betpaddi.com/api/investment/restake.php", {
+        token: token,
+        stake_id: stakeId,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+      if (response.status !== 200) throw new Error('Failed to unstake');
 
-  // restake: async (stakeId: string) => {
-  //   set({ loadingStakes: true });
-  //   try {
-  //     const stake = get().stakes.find(s => s.id === stakeId);
-  //     if (!stake) throw new Error('Stake not found');
 
-  //     const newAmount = stake.amount + stake.total_earned;
-  //     const newStake: Stake = {
-  //       ...stake,
-  //       id: Date.now().toString(),
-  //       amount: newAmount,
-  //       total_earned: 0,
-  //       start_date: new Date().toISOString(),
-  //       end_date: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()
-  //     };
+      console.log(response.data);
 
-  //     set(state => ({
-  //       stakes: [
-  //         ...state.stakes.filter(s => s.id !== stakeId),
-  //         newStake
-  //       ]
-  //     }));
-  //   } catch (error) {
-  //     set({ error: (error as Error).message });
-  //   } finally {
-  //     set({ loading: false });
-  //   }
-  // },
+    } catch (error) {
+      console.error('unstake error:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        set({ restakeError: error.response.data.message });
+      } else {
+        set({ restakeError: String(error) });
+        throw error;
+      }
+    } finally {
+      set({ loadingRestake: false });
+      return
+    }
+  },
 
   // unstake: async (stakeId: string) => {
   //   set({ loading: true });

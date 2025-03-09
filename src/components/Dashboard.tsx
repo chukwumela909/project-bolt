@@ -6,6 +6,7 @@ import { useUserStore } from '../store/userStore';
 import { useStakingStore } from '../store/stakingStore';
 import { UnstakeModal } from './UnstakeModal';
 import { DepositModal } from './DepositModal';
+import { RestakeModal } from './RestakeModal';
 import { ReferralStats } from './ReferralStats';
 import {
   LineChart,
@@ -23,6 +24,7 @@ import {
 
 } from 'lucide-react';
 import { WithdrawModal } from './WithdrawModal';
+
 
 
 
@@ -65,6 +67,7 @@ function Dashboard() {
     loadingStakes,
     loadingAddress,
     fetchStakes,
+    loadingRestake,
     getDepositAddress,
     deposit_address,
   } = useStakingStore();
@@ -76,9 +79,11 @@ function Dashboard() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   // const [selectedStake, setSelectedStake] = useState<string | null>(null);
   const [unstakeModalOpen, setUnstakeModalOpen] = useState(false);
+  const [restakeModalOpen, setRestakeModalOpen] = useState(false);
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [withdrawrefModalOpen, setWithdrawrefModalOpen] = useState(false);
   const [selectedUnstake, setSelectedUnstake] = useState<any>(null);
+  const [selectedRestake, setSelectedRestake] = useState<any>(null);
   const [depositAddress, setDepositAddress] = useState<string>('');
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [ethPriceError, setEthPriceError] = useState<boolean>(false);
@@ -171,29 +176,19 @@ function Dashboard() {
     } catch (error) {
       console.error('Error handling stake:', error);
     } finally {
-      // if (!depositModalOpen) {
-      //   setActionLoading(null);
-      //   setSelectedPlan(null);
-      //   setDepositAddress('');
-      // }
     }
   };
 
-  // const handleRestake = async (stakeId: string) => {
-  //   try {
-  //     setActionLoading(stakeId + '_restake');
-  //     await restake(stakeId);
-  //     await fetchStakes();
-  //   } catch (error) {
-  //     console.error('Restake error:', error);
-  //   } finally {
-  //     setActionLoading(null);
-  //   }
-  // };
+
 
   const handleUnstakeClick = (stake: any) => {
     setSelectedUnstake(stake);
     setUnstakeModalOpen(true);
+  };
+
+  const handleRestakeClick = (stakeid: any) => {
+    setSelectedRestake(stakeid);
+    setRestakeModalOpen(true);
   };
 
   const handleWithdrawRefClick = () => {
@@ -345,7 +340,7 @@ function Dashboard() {
               </div>
               <div className="bg-blue-500/20 p-2 rounded-lg">
                 <Wallet className="w-6 h-6 text-blue-400" />
-              </div>  
+              </div>
             </div>
           </div>
 
@@ -452,8 +447,8 @@ function Dashboard() {
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              // onClick={() => handleRestake(stake.id)}
-                              // disabled={actionLoading === stake.id + '_restake'}
+                              onClick={() => handleRestakeClick(stake.id)}
+                              disabled={loadingRestake == true ? true : false}
                               className="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center space-x-2 text-sm hover:bg-green-600 transition-colors disabled:opacity-50"
                             >
                               <RefreshCw className="w-4 h-4" />
@@ -624,10 +619,22 @@ function Dashboard() {
         balance={Number(user.earnings)}
         onClose={() => {
           setWithdrawrefModalOpen(false);
-          
+
         }}
 
       />
+
+      <RestakeModal
+        isOpen={restakeModalOpen}
+        onClose={() => {
+          setRestakeModalOpen(false)
+        }
+        }
+        stakeID={selectedRestake}
+      />
+
+
+
     </div>
   );
 }
