@@ -100,7 +100,7 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
         setTimeout(() => {
           document.body.removeChild(alertMessage);
         }, 3000);
-      navigate('/dashboard')
+        navigate('/dashboard')
 
       }
 

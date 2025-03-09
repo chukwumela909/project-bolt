@@ -1,7 +1,9 @@
-import  { useState, useEffect } from 'react';
-import {  AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
 import { useStakingStore } from '../store/stakingStore';
+import { useToast } from './Toast';
+
 
 interface RestakeModalProps {
     isOpen: boolean;
@@ -15,6 +17,15 @@ export function RestakeModal({ isOpen, stakeID, onClose }: RestakeModalProps) {
 
     const { restake, restakeError } = useStakingStore();
 
+    const { showToast } = useToast();
+
+     // Reset error when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      setError("")
+    }
+  }, [isOpen])
+
     useEffect(() => {
         if (restakeError) {
             setError(restakeError);
@@ -23,30 +34,18 @@ export function RestakeModal({ isOpen, stakeID, onClose }: RestakeModalProps) {
 
     const handleRestake = async () => {
         setError('');
-        console.log(stakeID);
+        setIsLoading(true);
         try {
-            setIsLoading(true);
             await restake(stakeID);
             if (restakeError) {
-                setError(restakeError);
-                const alertMessage = document.createElement('div');
-                alertMessage.textContent = restakeError;
-                alertMessage.style.position = 'fixed';
-                alertMessage.style.top = '50%';
-                alertMessage.style.left = '50%';
-                alertMessage.style.transform = 'translate(-50%, -50%)';
-                alertMessage.style.backgroundColor = 'red';
-                alertMessage.style.color = 'white';
-                alertMessage.style.padding = '10px';
-                alertMessage.style.borderRadius = '5px';
-                document.body.appendChild(alertMessage);
-
-                setTimeout(() => {
-                    document.body.removeChild(alertMessage);
-                }, 3000);
+               showToast(restakeError, 'error');
+            } else {
+                showToast('Restake successful. Earnings have been added to stake amount.', 'success');
+                onClose();
             }
         } catch (error) {
             console.error('Restake error:', error);
+            showToast(String(error), 'error');
         } finally {
             setIsLoading(false);
             // onClose();
@@ -78,12 +77,12 @@ export function RestakeModal({ isOpen, stakeID, onClose }: RestakeModalProps) {
                                 No
                             </button>
                         </div>
-                        {error &&  (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-sm text-red-400 mt-5 flex items-center space-x-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
+                        {error && (
+                            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-sm text-red-400 mt-5 flex items-center space-x-2">
+                                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                <span>{error}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

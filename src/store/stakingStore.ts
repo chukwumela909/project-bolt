@@ -35,7 +35,7 @@ interface StakingState {
   restakeError: string | null
   fetchStakes: () => Promise<void>;
   getDepositAddress: (plan: string) => Promise<void>;
-  restake: (stakeId: string) => Promise<void>;
+  restake: (stakeId: string) => Promise<boolean>;
   unstake: (stake_id: string, wallet_address: string, unstake_amount: string) => Promise<void>;
 
   // createStake: (plan: string, amount: number, dailyYield: number) => Promise<string>;
@@ -128,7 +128,7 @@ const useStakingStore = create<StakingState>((set) => ({
       }
     } finally {
       set({ loadingAddress: false });
-      return
+      // return false;
     }
   },
 
@@ -160,7 +160,7 @@ const useStakingStore = create<StakingState>((set) => ({
         wallet_address: wallet_address,
       })
 
-     
+
 
       if (response.status !== 200) throw new Error('Failed to unstake');
       const data = response.data;
@@ -198,17 +198,15 @@ const useStakingStore = create<StakingState>((set) => ({
 
 
 
-  restake: async (stakeId: string) => {
-    set({ loadingRestake: true });
+  restake: async (stakeId: string): Promise<boolean> => {
+    set({ loadingRestake: true, restakeError: null });
     try {
       const token = localStorage.getItem('auth-token');
-      console.log(token);
-      if (!token) {
-        console.log("No auth token found")
-        throw new Error('No auth token found');
-      }
 
-      console.log(stakeId);
+      if (!token) {
+        set({ restakeError: "No auth token found" })
+        return false;
+      }
 
       const response = await axios.post("https://stake.betpaddi.com/api/investment/restake.php", {
         token: token,
@@ -219,75 +217,28 @@ const useStakingStore = create<StakingState>((set) => ({
           'Accept': 'application/json',
         },
       });
+
+
       if (response.status !== 200) throw new Error('Failed to unstake');
 
 
-      console.log(response.data);
+      return true;
 
     } catch (error) {
-      console.error('unstake error:', error);
+      console.error('Restake error:', error);
       if (axios.isAxiosError(error) && error.response) {
-        set({ restakeError: error.response.data.message });
+        set({ restakeError: error.response.data.message || "Failed to restake" });
       } else {
         set({ restakeError: String(error) });
         throw error;
       }
+      return false
     } finally {
       set({ loadingRestake: false });
-      return
+
     }
   },
 
-  // unstake: async (stakeId: string) => {
-  //   set({ loading: true });
-  //   try {
-  //     set(state => ({
-  //       stakes: state.stakes.map(stake =>
-  //         stake.id === stakeId
-  //           ? { ...stake, status: 'completed' }
-  //           : stake
-  //       )
-  //     }));
-  //   } catch (error) {
-  //     set({ error: (error as Error).message });
-  //   } finally {
-  //     set({ loading: false });
-  //   }
-  // },
-
-  // initiateWithdrawal: async (stakeId: string, amount: number, address: string): Promise<void> => {
-  //   try {
-  //     const { data: { user } } = await supabase.auth.getUser();
-  //     if (!user) throw new Error('User not authenticated');
-
-  //     if (!ethers.isAddress(address)) {
-  //       throw new Error('Invalid Ethereum address');
-  //     }
-
-  //     const txHash = await walletCoreService.initiateWithdrawal(
-  //       user.id,
-  //       amount,
-  //       address
-  //     );
-
-  //     set(state => ({
-  //       stakes: state.stakes.map(stake =>
-  //         stake.id === stakeId
-  //           ? {
-  //             ...stake,
-  //             status: 'withdrawal_pending',
-  //             amount: stake.amount - amount
-  //           }
-  //           : stake
-  //       )
-  //     }));
-
-  //     console.log('Transaction Hash:', txHash);
-  //   } catch (error) {
-  //     console.error('Error initiating withdrawal:', error);
-  //     throw error;
-  //   }
-  // }
 }));
 
 export default useStakingStore;

@@ -15,6 +15,7 @@ import { Profile } from './components/Profile';
 import { ChangePassword } from './components/ChangePassword';
 import { Terms } from './components/Terms';
 import { PrivacyPolicy } from './components/Privacy';
+import { ToastProvider } from './components/Toast';
 // import { useUserStore } from './store/userStore';
 
 // function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -61,49 +62,51 @@ function App() {
   }
 
   return (
-    <Router>
-      <div className="min-h-screen animated-bg text-white">
-        <div className="grid-pattern" />
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="about" element={<About />} />
-            <Route path="features" element={<Features />} />
-            <Route path="faq" element={<FAQ />} />
-            <Route path="blog" element={<Blog />} />
-            <Route path="termsandcondition" element={<Terms />} />
-            <Route path="privacy" element={<PrivacyPolicy />} />
-            <Route path="forgotPassword" element={<ForgotPassword />} />
-            <Route path="changePassword" element={<ChangePassword />} />
+    <ToastProvider>
+      <Router>
+        <div className="min-h-screen animated-bg text-white">
+          <div className="grid-pattern" />
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="about" element={<About />} />
+              <Route path="features" element={<Features />} />
+              <Route path="faq" element={<FAQ />} />
+              <Route path="blog" element={<Blog />} />
+              <Route path="termsandcondition" element={<Terms />} />
+              <Route path="privacy" element={<PrivacyPolicy />} />
+              <Route path="forgotPassword" element={<ForgotPassword />} />
+              <Route path="changePassword" element={<ChangePassword />} />
 
-            <Route path="login" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
-          </Route>
+              <Route path="login" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
+            </Route>
 
-          <Route
-            path="/dashboard"
-            element={
+            <Route
+              path="/dashboard"
+              element={
 
-              <Dashboard />
+                <Dashboard />
 
-            }
-          />
+              }
+            />
 
-          <Route path="/profile" element={<Profile />} />
+            <Route path="/profile" element={<Profile />} />
 
 
-          <Route
-            path="/admin"
-            element={
+            <Route
+              path="/admin"
+              element={
 
-              <Admin />
+                <Admin />
 
-            }
-          />
+              }
+            />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
-    </Router>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </Router>
+    </ToastProvider>
   );
 }
 
