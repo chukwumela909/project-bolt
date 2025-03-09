@@ -136,7 +136,7 @@ export function ReferralStats({ referralCode, totalReferrals, handleWithdraw, ac
         
       </div>
 
-      <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50">
+      {/* <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50">
         <h3 className="text-lg font-semibold mb-4">Your Referrals</h3>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -150,7 +150,7 @@ export function ReferralStats({ referralCode, totalReferrals, handleWithdraw, ac
               </tr>
             </thead>
             <tbody>
-              {/* This will be populated with actual referral data */}
+      
               <tr className="text-slate-400 text-sm">
                 <td className="py-4 px-4" colSpan={5}>
                   No referrals yet. Share your referral link to start earning rewards!
@@ -159,7 +159,7 @@ export function ReferralStats({ referralCode, totalReferrals, handleWithdraw, ac
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

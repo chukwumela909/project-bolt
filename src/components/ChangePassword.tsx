@@ -159,7 +159,7 @@ export function ChangePassword() {
                         </div>
                         {passwordStrength.message && (
                             <div className={`mt-1 text-sm flex items-center space-x-1
-                ${passwordStrength.score >= 3 ? 'text-green-400' : 'text-yellow-400'}`}
+                      ${passwordStrength.score >= 3 ? 'text-green-400' : 'text-yellow-400'}`}
                             >
                                 {passwordStrength.score >= 3 ? (
                                     <CheckCircle2 className="w-4 h-4" />

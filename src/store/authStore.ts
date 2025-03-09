@@ -28,7 +28,7 @@ interface AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string, country: string,referred_by: string, phone: string) => Promise<void>;
   forgotPassword: (email: string,) => Promise<void>;
-  resetPassword: (newPassword: string,) => Promise<void>;
+  resetPassword: (reset_token: string, newPassword: string) => Promise<void>;
   updateProfile: ( name: string, country: string, phone: string) => Promise<void>;
   changePassword: ( password: string,) => Promise<void>;
   fetchUserData: () => Promise<void>;
@@ -173,10 +173,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  resetPassword: async (newPassword) => {
+  resetPassword: async (reset_token, newPassword) => {
     try {
       const response = await axios.post("https://stake.betpaddi.com/api/auth/reset-password.php", {
-        reset_token: 
+        reset_token,
         newPassword
       }, {
         headers: {
@@ -192,7 +192,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       // set({ user: data.user });
       if (response.status == 200) {
         const alertMessage = document.createElement('div');
-        alertMessage.textContent = "Password reset link has been sent to your email";
+        alertMessage.textContent = "Password reset successfully";
         alertMessage.style.position = 'fixed';
         alertMessage.style.top = '50%';
         alertMessage.style.left = '50%';
