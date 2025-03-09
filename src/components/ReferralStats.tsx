@@ -70,7 +70,7 @@ export function ReferralStats({ referralCode, totalReferrals, handleWithdraw, ac
             ) : (
               <>
                 <Copy className="w-4 h-4" />
-                <span>Copy Referral Link</span>
+                <span>Copy Referral Code</span>
               </>
             )}
             </motion.button> 

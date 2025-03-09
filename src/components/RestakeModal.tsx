@@ -18,6 +18,8 @@ export function RestakeModal({ isOpen, stakeID, onClose }: RestakeModalProps) {
     const { restake, restakeError } = useStakingStore();
 
     const { showToast } = useToast();
+    const currentError = useStakingStore.getState().restakeError
+
 
      // Reset error when modal opens/closes
   useEffect(() => {
@@ -27,8 +29,8 @@ export function RestakeModal({ isOpen, stakeID, onClose }: RestakeModalProps) {
   }, [isOpen])
 
     useEffect(() => {
-        if (restakeError) {
-            setError(restakeError);
+        if (currentError) {
+            setError(currentError);
         }
     }, [restakeError]);
 
@@ -37,13 +39,10 @@ export function RestakeModal({ isOpen, stakeID, onClose }: RestakeModalProps) {
         setIsLoading(true);
         try {
           const result =  await restake(stakeID);
-          const currentError = useStakingStore.getState().restakeError
-            if (!result) {
-               showToast(currentError || "Failed to restake", "error");
-            } else {
+            if (result) {
                 showToast('Restake successful. Earnings have been added to stake amount.', 'success');
                 onClose();
-            }
+            } 
         } catch (error) {
             console.error('Restake error:', error);
             showToast(String(error), 'error');

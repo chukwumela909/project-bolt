@@ -24,12 +24,7 @@ interface UnstakeModalProps {
 export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalProps) {
 
 
-  const daysRemaining = Math.max(
-    0,
-    Math.ceil(
-      (new Date(stake.staked_at).getTime() + Number(stake.lock_period_days) * 24 * 60 * 60 * 1000 - new Date().getTime()) / (1000 * 60 * 60 * 24)
-    )
-  )
+  const daysRemaining = calculateRemainingDaysCustomFormat(stake.staked_at, Number(stake.lock_period_days));
 
 
 
@@ -44,6 +39,9 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
 
   const { unstake,  unstakeError } = useStakingStore();
 
+  const currentError = useStakingStore.getState().unstakeError
+
+
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -53,12 +51,31 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
   }, [isOpen]);
 
   useEffect(() => {
-    if (unstakeError) {
-      setError(unstakeError);
+    if (currentError) {
+      setError(currentError);
       setUnstakeAmount('');
       setwalletAddress('');
     }
   }, [unstakeError]);
+
+  function calculateRemainingDaysCustomFormat(
+    stakedDate: string,
+    lockPeriodDays: number,
+    currentDate: string = new Date().toISOString().split('T')[0]
+  ): number {
+    const stakedDateParts = stakedDate.split(' '); // Split date and time
+    const stakedDateOnly = stakedDateParts[0]; // Get the date part
+    const stakedDateTime = new Date(stakedDateOnly);
+    const currentDateTime = new Date(currentDate);
+  
+    const lockPeriodEndDate = new Date(stakedDateTime);
+    lockPeriodEndDate.setDate(stakedDateTime.getDate() + lockPeriodDays);
+  
+    const timeDifference = lockPeriodEndDate.getTime() - currentDateTime.getTime();
+    const daysRemaining = Math.ceil(timeDifference / (1000 * 3600 * 24));
+  
+    return daysRemaining;
+  }
 
 
   const handleUnstakeAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,13 +106,10 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
       }
 
      const result = await unstake(id, walletAddress, unstakeAmount.toString());
-     const currentError = useStakingStore.getState().unstakeError
-      if (!result) {
-        showToast(currentError || "Failed to unstake", "error");
-      } else {
+      if (result) {
         showToast('Unstake successful. Earnings have been added to your wallet.', 'success');
         onClose();
-      }
+      } 
 
     } catch (error) {
       console.error('Unstake error:', error);

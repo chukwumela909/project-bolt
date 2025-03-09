@@ -161,7 +161,7 @@ const useStakingStore = create<StakingState>((set) => ({
     } catch (error) {
       console.error('unstake error:', error);
       if (axios.isAxiosError(error) && error.response) {
-        set({ unstakeError: error.response.data.error || "Failed to unstake" });
+        set({ unstakeError: error.response.data.message || "Failed to unstake" });
       } else {
         set({ unstakeError: String(error) });
         throw error;

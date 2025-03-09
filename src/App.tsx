@@ -16,6 +16,7 @@ import { ChangePassword } from './components/ChangePassword';
 import { Terms } from './components/Terms';
 import { PrivacyPolicy } from './components/Privacy';
 import { ToastProvider } from './components/Toast';
+import { ResetPassword } from './components/ResetPassword';
 // import { useUserStore } from './store/userStore';
 
 // function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -76,6 +77,7 @@ function App() {
               <Route path="termsandcondition" element={<Terms />} />
               <Route path="privacy" element={<PrivacyPolicy />} />
               <Route path="forgotPassword" element={<ForgotPassword />} />
+              <Route path="resetPassword" element={<ResetPassword />} />
               <Route path="changePassword" element={<ChangePassword />} />
 
               <Route path="login" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />

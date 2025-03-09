@@ -179,6 +179,25 @@ function Dashboard() {
     }
   };
 
+  function calculateRemainingDaysCustomFormat(
+    stakedDate: string,
+    lockPeriodDays: number,
+    currentDate: string = new Date().toISOString().split('T')[0]
+  ): number {
+    const stakedDateParts = stakedDate.split(' '); // Split date and time
+    const stakedDateOnly = stakedDateParts[0]; // Get the date part
+    const stakedDateTime = new Date(stakedDateOnly);
+    const currentDateTime = new Date(currentDate);
+  
+    const lockPeriodEndDate = new Date(stakedDateTime);
+    lockPeriodEndDate.setDate(stakedDateTime.getDate() + lockPeriodDays);
+  
+    const timeDifference = lockPeriodEndDate.getTime() - currentDateTime.getTime();
+    const daysRemaining = Math.ceil(timeDifference / (1000 * 3600 * 24));
+  
+    return daysRemaining;
+  }
+
 
 
   const handleUnstakeClick = (stake: any) => {
@@ -422,12 +441,7 @@ function Dashboard() {
           {activeStakes.length > 0 ? (
             <div className="grid gap-4">
               {activeStakes.map(stake => {
-                const daysRemaining = Math.max(
-                  0,
-                  Math.ceil(
-                    (new Date(stake.staked_at).getTime() + Number(stake.lock_period_days) * 24 * 60 * 60 * 1000 - new Date().getTime()) / (1000 * 60 * 60 * 24)
-                  )
-                );
+                const daysRemaining = calculateRemainingDaysCustomFormat(stake.staked_at, Number(stake.lock_period_days));
 
                 return (
                   <motion.div

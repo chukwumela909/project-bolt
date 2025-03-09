@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+// import { useAuthStore } from '../store/authStore';
 import {
     Mail,
 
@@ -13,34 +13,35 @@ import {
 
 export function ResetPassword() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: '',
-    });
+    // const [formData, setFormData] = useState({
+    //     reset_token: '',
+    //     new_password: '',
+    // });
 
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const { resetPassword } = useAuthStore();
+    // const { resetPassword } = useAuthStore();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const { name, value, type, checked } = e.target;
+    //     // setFormData(prev => ({
+    //     //     ...prev,
+    //     //     [name]: type === 'checkbox' ? checked : value
+    //     // }));
 
 
-        // Clear errors when user starts typing
-        setError('');
-    };
+    //     // Clear errors when user starts typing
+    //     setError('');
+    // };
 
-    const validateForm = () => {
-        if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-            setError('Please enter a valid email address');
-            return false;
-        }
-        return true;
-    };
+    // const validateForm = () => {
+    //     if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    //         setError('Please enter a valid email address');
+    //         return false;
+    //     }
+    //     return true;
+    // };
 
       const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -48,13 +49,13 @@ export function ResetPassword() {
         setIsLoading(true);
 
         
-        if (!validateForm()) {
-            setIsLoading(false);
-            return;
-        }
+        // if (!validateForm()) {
+        //     setIsLoading(false);
+        //     return;
+        // }
         
         try {
-          await resetPassword(formData.email);
+        //   await resetPassword(formData.email);
         } catch (err) {
           setError(String(err));
         } finally {
@@ -92,8 +93,8 @@ export function ResetPassword() {
                    <input
                      type="email"
                      name="email"
-                     value={formData.email}
-                     onChange={handleChange}
+                    //  value={formData.email}
+                    //  onChange={handleChange}
                      className="w-full bg-slate-900/50 border border-slate-700 rounded-lg py-2 pl-10 pr-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                      placeholder="you@example.com"
                      required
