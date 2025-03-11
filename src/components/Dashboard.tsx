@@ -451,6 +451,7 @@ function Dashboard() {
             <div className="grid gap-4">
               {activeStakes.map(stake => {
                 const daysRemaining = calculateRemainingDaysCustomFormat(stake.staked_at, Number(stake.lock_period_days));
+                const bonus_daysRemaining = 60 - (Number(stake.lock_period_days) - daysRemaining);
 
                 return (
                   <motion.div
@@ -509,8 +510,8 @@ function Dashboard() {
                         </div>
                         <div>
                           <p className="text-sm text-slate-400">Reward Cycle / Bonus Yeild</p>
-                          <p className="text-lg font-bold">{daysRemaining} days Remaining / {60 - (Number(stake.lock_period_days) - daysRemaining)} days Remaining </p>
-                          <p className='text-sm '>{planNotes[stake.plan_id as keyof typeof planNotes]}</p>
+                          <p className="text-md font-bold">{daysRemaining < 0 ? 0 : daysRemaining} days Remaining / {bonus_daysRemaining < 0 ? 0 : bonus_daysRemaining} days Remaining </p>
+                          <p className='text-sm text-gray-300'>{planNotes[stake.plan_id as keyof typeof planNotes]}</p>
                         </div>
                       </div>
                     </div>

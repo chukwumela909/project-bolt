@@ -64,6 +64,7 @@ export const useUserStore = create<UserState>((set) => ({
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    "Authorization": "Bearer a7bX9c2dE5fg1h8i"
                 },
             });
 
@@ -96,6 +97,7 @@ export const useUserStore = create<UserState>((set) => ({
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    "Authorization": "Bearer a7bX9c2dE5fg1h8i"
                 },
             });
 
