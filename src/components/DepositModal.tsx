@@ -1,6 +1,6 @@
 import  { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Copy, X, Wallet, CheckCircle2 } from 'lucide-react';
+import { Copy, X, Wallet, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -8,9 +8,10 @@ interface DepositModalProps {
   depositAddress: string;
   minAmount: number;
   ethPrice: number;
+  error: string;
 }
 
-export function DepositModal({ isOpen, onClose, depositAddress, minAmount, ethPrice }: DepositModalProps) {
+export function DepositModal({ isOpen, onClose, depositAddress, minAmount, ethPrice, error }: DepositModalProps) {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
@@ -83,6 +84,13 @@ export function DepositModal({ isOpen, onClose, depositAddress, minAmount, ethPr
                   </>
                 )}
               </button>
+
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-sm text-red-400 flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
 
               <div className="text-sm text-slate-400">
                 <p>• Send only ETH to this address.</p>

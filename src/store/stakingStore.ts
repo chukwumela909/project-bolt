@@ -33,8 +33,9 @@ interface StakingState {
   error: string | null;
   unstakeError: string | null
   restakeError: string | null
+  depositError: string | null
   fetchStakes: () => Promise<void>;
-  getDepositAddress: (plan: string) => Promise<void>;
+  getDepositAddress: (plan: string) => Promise<boolean>;
   restake: (stakeId: string) => Promise<boolean>;
   unstake: (stake_id: string, wallet_address: string, unstake_amount: string) => Promise<boolean>;
 
@@ -56,6 +57,7 @@ const useStakingStore = create<StakingState>((set) => ({
   error: null,
   unstakeError: null,
   restakeError: null,
+  depositError: null,
 
   fetchStakes: async () => {
     set({ loadingStakes: true });
@@ -93,15 +95,16 @@ const useStakingStore = create<StakingState>((set) => ({
     }
   },
 
-  getDepositAddress: async (plan: string): Promise<void> => {
-    set({ loadingAddress: true });
+  getDepositAddress: async (plan: string): Promise<boolean> => {
+    set({ loadingAddress: true,  depositError: null});
     try {
       const token = localStorage.getItem('auth-token');
-      console.log(token);
+
       if (!token) {
-        console.log("No auth token found")
-        throw new Error('No auth token found');
+        set({ depositError: "No auth token found" })
+        return false
       }
+
       const response = await axios.post("https://stake.betpaddi.com/api/investment/stake.php", {
         token: token,
         plan_id: plan
@@ -112,20 +115,26 @@ const useStakingStore = create<StakingState>((set) => ({
         },
       });
 
-      console.log(response);
 
-      if (response.status !== 200) throw new Error('Failed to generate deposit address');
+      if (response.status !== 200) {
+        set({depositError : 'Failed to generate deposit address'})
+        return false;
+      }
+
       const data = response.data;
-      console.log(data);
       set({ deposit_address: data['deposit_address'] });
+      return true
+
+      
     } catch (error) {
-      console.error('Fetch stakes error:', error);
+      console.error('Generate address:', error);
       if (axios.isAxiosError(error) && error.response) {
-        set({ error: error.response.data });
+        set({ depositError: error.response.data.message || "Failed generate" });
       } else {
-        set({ error: String(error) });
+        set({ depositError: String(error) });
         throw error;
       }
+      return false
     } finally {
       set({ loadingAddress: false });
       // return false;

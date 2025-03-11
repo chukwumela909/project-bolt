@@ -69,6 +69,7 @@ function Dashboard() {
     fetchStakes,
     loadingRestake,
     getDepositAddress,
+    depositError,
     deposit_address,
   } = useStakingStore();
 
@@ -167,7 +168,8 @@ function Dashboard() {
     try {
       setSelectedPlan({ name: plan, minStake });
       console.log(`Selected plan: ${plan}, ${planId}, ${minStake}`);
-      await getDepositAddress(planId);
+     await getDepositAddress(planId);
+
       if (deposit_address) {
         setDepositAddress(deposit_address);
       }
@@ -625,6 +627,7 @@ function Dashboard() {
         depositAddress={deposit_address!}
         minAmount={selectedPlan?.minStake || 0}
         ethPrice={ethPrice}
+        error = {depositError!}
       />
 
       <WithdrawModal
