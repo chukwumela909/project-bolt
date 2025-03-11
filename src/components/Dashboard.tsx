@@ -511,7 +511,7 @@ function Dashboard() {
                         <div>
                           <p className="text-sm text-slate-400">Reward Cycle / Bonus Yeild</p>
                           <p className="text-md font-bold">{daysRemaining < 0 ? 0 : daysRemaining} days Remaining / {bonus_daysRemaining < 0 ? 0 : bonus_daysRemaining} days Remaining </p>
-                          <p className='text-sm text-gray-300'>{planNotes[stake.plan_id as keyof typeof planNotes]}</p>
+                          <p className='text-sm mt-2 italic text-yellow-700'>{planNotes[stake.plan_id as keyof typeof planNotes]}</p>
                         </div>
                       </div>
                     </div>
@@ -569,13 +569,13 @@ function Dashboard() {
                   <div className="space-y-3 mb-6">
                     <div className="flex justify-between items-center">
                       <span className="text-white/80">Min Stake</span>
-                      <span className="font-bold">{plan.min_amount} ETH</span>
+                      <span className="font-bold">{Number(plan.min_amount).toFixed(2)} ETH</span>
                     </div>
                     <div className="text-sm text-white/80 text-right">
                       ≈ ${(Number(plan.min_amount) * ethPrice).toLocaleString()}
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-white/80">Daily Yields</span>
+                      <span className="text-white/80">Daily Yield</span>
                       <span className="font-bold">{plan.dpy}%</span>
                     </div>
                     <div className="flex justify-between items-center">

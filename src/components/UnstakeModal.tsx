@@ -30,7 +30,7 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
 
 
   const penaltyPercentage = Number(stake.penalty); // 10% penalty for early withdrawal
-  const feePercentage = 5; // 10% penalty for early withdrawal
+  const feePercentage = 10; // 10% penalty for early withdrawal
   const [unstakeAmount, setUnstakeAmount] = useState('');
   const [walletAddress, setwalletAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
