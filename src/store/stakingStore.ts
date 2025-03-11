@@ -16,6 +16,7 @@ interface Stake {
   loyalty_bonus: string;
   staked_at: string;
   restake: string;
+  bonus_note: string;
   unstaked_at: string | null;
   unstaked: string;
   tx_id: string;
@@ -204,10 +205,7 @@ const useStakingStore = create<StakingState>((set) => ({
       });
 
 
-      if (response.status !== 200){
-        set({ restakeError: "Failed to restake" })
-        return false;
-      }
+      if (response.status !== 200) throw new Error('Failed to restake');
 
       return true;
 

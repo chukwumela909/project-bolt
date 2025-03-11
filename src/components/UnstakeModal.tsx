@@ -159,7 +159,7 @@ export function UnstakeModal({ isOpen, onClose, stake, ethPrice }: UnstakeModalP
 
             <div className="space-y-4">
               <p className="text-slate-300">
-                You still have <span className="text-amber-400 font-bold">{daysRemaining} days</span> remaining in your staking period.
+                You still have <span className="text-amber-400 font-bold">{daysRemaining} days</span> remaining in your staking cycle.
                 Early unstaking will result in a penalty.
               </p>
 

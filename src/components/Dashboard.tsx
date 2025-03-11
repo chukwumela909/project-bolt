@@ -26,6 +26,13 @@ import {
 import { WithdrawModal } from './WithdrawModal';
 
 
+const planNotes: { [key: string]: string } = {
+  "045a88bc-e647-11ef-8679-04421a23dd01": "Note: If no withdrawals are made for 60 days, you will receive a bonus yield increase of 0.05% per month (max yield 1.5%)",
+  "045a8a8b-e647-11ef-8679-04421a23dd01": "Note: If no withdrawals are made for 60 days, you will receive a bonus yield increase of 0.05% per month (max yield 2.5%)",
+  "045a8b03-e647-11ef-8679-04421a23dd01": "Note: If no withdrawals are made for 60 days, you will receive a bonus yield increase of 0.05% per month (max yield 3.5%)",
+  "174e640d-e6e1-11ef-8679-04421a23dd01": "Note: If no withdrawals are made for 60 days, you will receive a bonus yield increase of 0.05% per month (max yield 3.5%)"
+};
+
 
 
 const componentMap = {
@@ -455,12 +462,11 @@ function Dashboard() {
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <h3 className="text-xl font-bold">{activeStakesPlanMatch[stake.plan_id as keyof typeof activeStakesPlanMatch]}</h3>
-                          <p className="text-sm text-slate-400">Started {new Date(stake.staked_at).toLocaleDateString()}</p>
+                          <p className="text-sm text-slate-400">Started {new Date(stake.created_at).toLocaleDateString()}</p>
                         </div>
 
                         <div className="flex space-x-2">
-                          {stake.restake == '0' ? (
-                            <motion.button
+                        <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleRestakeClick(stake.id)}
@@ -470,9 +476,6 @@ function Dashboard() {
                               <RefreshCw className="w-4 h-4" />
                               <span>Restake</span>
                             </motion.button>
-                          ) : (
-                            <div className=""></div>
-                          )}
 
 
                           <motion.button
@@ -505,9 +508,9 @@ function Dashboard() {
                           <p className="text-sm text-blue-500">≈ ${(Number(stake.earnings) * ethPrice).toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-slate-400">Time Remaining</p>
-                          <p className="text-lg font-bold">{daysRemaining} days</p>
-                          <p>Ends {new Date(new Date(stake.staked_at).getTime() + Number(stake.lock_period_days) * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                          <p className="text-sm text-slate-400">Reward Cycle / Bonus Yeild</p>
+                          <p className="text-lg font-bold">{daysRemaining} days Remaining / {60 - (Number(stake.lock_period_days) - daysRemaining)} days Remaining </p>
+                          <p className='text-sm '>{planNotes[stake.plan_id as keyof typeof planNotes]}</p>
                         </div>
                       </div>
                     </div>
@@ -571,7 +574,7 @@ function Dashboard() {
                       ≈ ${(Number(plan.min_amount) * ethPrice).toLocaleString()}
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-white/80">Daily Rewards</span>
+                      <span className="text-white/80">Daily Yields</span>
                       <span className="font-bold">{plan.dpy}%</span>
                     </div>
                     <div className="flex justify-between items-center">
