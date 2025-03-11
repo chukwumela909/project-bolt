@@ -66,7 +66,6 @@ function App() {
     <ToastProvider>
       <Router>
         <div className="min-h-screen animated-bg text-white">
-          <div className="grid-pattern" />
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
@@ -74,8 +73,8 @@ function App() {
               <Route path="features" element={<Features />} />
               <Route path="faq" element={<FAQ />} />
               <Route path="blog" element={<Blog />} />
-              <Route path="termsandcondition" element={<Terms />} />
-              <Route path="privacy" element={<PrivacyPolicy />} />
+              <Route path="terms-and-conditions" element={<Terms />} />
+              <Route path="privacy-policy" element={<PrivacyPolicy />} />
               <Route path="forgotPassword" element={<ForgotPassword />} />
               <Route path="resetPassword" element={<ResetPassword />} />
               <Route path="changePassword" element={<ChangePassword />} />

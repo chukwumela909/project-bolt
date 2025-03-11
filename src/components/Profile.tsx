@@ -196,7 +196,7 @@ export function Profile() {
                             {'Change Password'}
                         </button>
                     </div>
-                    <div className="mt-4 text-center">
+                    {/* <div className="mt-4 text-center">
                         <button
                             onClick={() => {
                                 navigate('/termsandcondition');
@@ -214,7 +214,7 @@ export function Profile() {
                         >
                             {'Privacy Policy'}
                         </button>
-                    </div>
+                    </div> */}
                 </form>
             </motion.div>
         </div>

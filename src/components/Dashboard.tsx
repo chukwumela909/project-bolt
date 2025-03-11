@@ -573,7 +573,7 @@ function Dashboard() {
                       <span className="font-bold">{plan.dpy}%</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-white/80">Duration</span>
+                      <span className="text-white/80">Reward Cycle</span>
                       <span className="font-bold">{plan.lock_period_days} days</span>
                     </div>
                   </div>

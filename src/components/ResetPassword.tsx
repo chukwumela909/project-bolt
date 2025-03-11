@@ -83,14 +83,16 @@ export function ResetPassword() {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
 
-        if (token) {
-            setFormData(prev => ({
-                ...prev,
-                reset_token : token
-            }));
-        } else {
-            setError('Invalid reset link');
-        }
+        // if (token) {
+        //     setFormData(prev => ({
+        //         reset_token : token,
+        //         new_password: prev.new_password,
+                
+            
+        //     }));
+        // } else {
+        //     setError('Invalid reset link');
+        // }
     }, []);
 
     const validateForm = () => {
@@ -103,8 +105,23 @@ export function ResetPassword() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        if (token) {
+            setFormData(prev => ({
+                reset_token : token,
+                new_password: prev.new_password,
+                
+            
+            }));
+        } else {
+            setError('Invalid reset link');
+        }
+
         setError('');
         setIsLoading(true);
+
+
 
         console.log(formData);
 
