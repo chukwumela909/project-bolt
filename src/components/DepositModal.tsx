@@ -85,9 +85,9 @@ export function DepositModal({ isOpen, onClose, depositAddress, minAmount, ethPr
               </button>
 
               <div className="text-sm text-slate-400">
-                <p>• Send only ETH to this address</p>
-                <p>• Minimum deposit amount: {minAmount} ETH</p>
-                <p>• Deposits will be credited after network confirmation</p>
+                <p>• Send only ETH to this address.</p>
+                <p>• Minimum deposit amount: {minAmount} ETH.</p>
+                <p>• Deposits will be credited after network confirmation.</p>
               </div>
             </div>
           </motion.div>
