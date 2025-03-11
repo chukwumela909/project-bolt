@@ -16,6 +16,7 @@ import {
 
 export function ResetPassword() {
     const navigate = useNavigate();
+    // const [urlToken, setUrlToken] = useState('')
     const [formData, setFormData] = useState({
         reset_token: '',
         new_password: '',
@@ -24,43 +25,58 @@ export function ResetPassword() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    
 
-        const [passwordStrength, setPasswordStrength] = useState({
-            score: 0,
-            message: '',
-        });
-    
-        const validatePassword = (password: string) => {
-            let score = 0;
-            let message = '';
-    
-            if (password.length >= 8) score++;
-            if (password.match(/[A-Z]/)) score++;
-            if (password.match(/[0-9]/)) score++;
-            if (password.match(/[^A-Za-z0-9]/)) score++;
-    
-            switch (score) {
-                case 0:
-                    message = 'Very Weak';
-                    break;
-                case 1:
-                    message = 'Weak';
-                    break;
-                case 2:
-                    message = 'Fair';
-                    break;
-                case 3:
-                    message = 'Good';
-                    break;
-                case 4:
-                    message = 'Strong';
-                    break;
-            }
-    
-            setPasswordStrength({ score, message });
-            return score >= 3;
-        };
+
+    const [passwordStrength, setPasswordStrength] = useState({
+        score: 0,
+        message: '',
+    });
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        // setUrlToken(token!)
+
+        if (token) {
+            setFormData(prev => ({
+                reset_token: token,
+                new_password: prev.new_password,
+            }));
+        } else {
+            setError('Invalid reset link');
+        }
+    }, []);
+
+    const validatePassword = (password: string) => {
+        let score = 0;
+        let message = '';
+
+        if (password.length >= 8) score++;
+        if (password.match(/[A-Z]/)) score++;
+        if (password.match(/[0-9]/)) score++;
+        if (password.match(/[^A-Za-z0-9]/)) score++;
+
+        switch (score) {
+            case 0:
+                message = 'Very Weak';
+                break;
+            case 1:
+                message = 'Weak';
+                break;
+            case 2:
+                message = 'Fair';
+                break;
+            case 3:
+                message = 'Good';
+                break;
+            case 4:
+                message = 'Strong';
+                break;
+        }
+
+        setPasswordStrength({ score, message });
+        return score >= 3;
+    };
 
     const { resetPassword } = useAuthStore();
 
@@ -69,7 +85,7 @@ export function ResetPassword() {
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
-            
+
         }));
 
         if (name === 'password') {
@@ -79,21 +95,7 @@ export function ResetPassword() {
         setError('');
     };
 
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
 
-        // if (token) {
-        //     setFormData(prev => ({
-        //         reset_token : token,
-        //         new_password: prev.new_password,
-                
-            
-        //     }));
-        // } else {
-        //     setError('Invalid reset link');
-        // }
-    }, []);
 
     const validateForm = () => {
         if (!validatePassword(formData.new_password)) {
@@ -109,10 +111,10 @@ export function ResetPassword() {
         const token = urlParams.get('token');
         if (token) {
             setFormData(prev => ({
-                reset_token : token,
+                reset_token: token ,
                 new_password: prev.new_password,
-                
-            
+
+
             }));
         } else {
             setError('Invalid reset link');
@@ -162,7 +164,7 @@ export function ResetPassword() {
                 <form onSubmit={handleSubmit} className="space-y-4">
 
 
-                <div>
+                    <div>
                         <label className="block text-sm font-medium mb-1">Password</label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />

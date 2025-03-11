@@ -28,7 +28,7 @@ interface AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string, country: string,referred_by: string, phone: string) => Promise<void>;
   forgotPassword: (email: string,) => Promise<void>;
-  resetPassword: (reset_token: string, newPassword: string) => Promise<void>;
+  resetPassword: (reset_token: string, new_password: string) => Promise<void>;
   updateProfile: ( name: string, country: string, phone: string) => Promise<void>;
   changePassword: ( password: string,) => Promise<void>;
   fetchUserData: () => Promise<void>;
@@ -173,11 +173,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  resetPassword: async (reset_token, newPassword) => {
+  resetPassword: async (reset_token, new_password) => {
     try {
       const response = await axios.post("https://stake.betpaddi.com/api/auth/reset-password.php", {
-        reset_token,
-        newPassword
+        reset_token: reset_token,
+        new_password : new_password
       }, {
         headers: {
           'Content-Type': 'application/json',
