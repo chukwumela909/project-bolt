@@ -511,7 +511,7 @@ function Dashboard() {
                         <div>
                           <p className="text-sm text-slate-400">Reward Cycle / Bonus Yeild</p>
                           <p className="text-md font-bold">{daysRemaining < 0 ? 0 : daysRemaining} days Remaining / {bonus_daysRemaining < 0 ? 0 : bonus_daysRemaining} days Remaining </p>
-                          <p className='text-sm mt-2 italic text-yellow-700'>{planNotes[stake.plan_id as keyof typeof planNotes]}</p>
+                          <p className='text-xs mt-2 text-amber-400'>{planNotes[stake.plan_id as keyof typeof planNotes]}</p>
                         </div>
                       </div>
                     </div>

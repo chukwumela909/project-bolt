@@ -58,7 +58,7 @@ export const useUserStore = create<UserState>((set) => ({
                 throw new Error('No auth token found');
             }
 
-            const response = await axios.post("https://stake.betpaddi.com/api/auth/user-data.php", {
+            const response = await axios.post("https://app.starkord.com/api/auth/user-data.php", {
                 token: token
             }, {
                 headers: {
@@ -93,7 +93,7 @@ export const useUserStore = create<UserState>((set) => ({
         set({ loading: true, error: null });
         try {
 
-            const response = await axios.get("https://stake.betpaddi.com/api/investment/plans.php", {
+            const response = await axios.get("https://app.starkord.com/api/investment/plans.php", {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

@@ -73,7 +73,7 @@ export const useReferralStore = create<ReferralState>((set) => ({
         console.log("No auth token found")
         throw new Error('No auth token found');
       }
-      const response = await axios.post("https://stake.betpaddi.com/api/withdrawal/create.php", {
+      const response = await axios.post("https://app.starkord.com/api/withdrawal/create.php", {
         token: token,
         amount: amount,
         eth_address: eth_address,

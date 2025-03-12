@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signIn: async (email, password) => {
     try {
-      const response = await axios.post("https://stake.betpaddi.com/api/auth/login.php", {
+      const response = await axios.post("https://app.starkord.com/api/auth/login.php", {
         email,
         password
       }, {
@@ -91,7 +91,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         payload.referred_by = referred_by;
       }
 
-      const response = await axios.post("https://stake.betpaddi.com/api/auth/register.php", payload, {
+      const response = await axios.post("https://app.starkord.com/api/auth/register.php", payload, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -134,7 +134,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   forgotPassword: async (email) => {
     try {
-      const response = await axios.post("https://stake.betpaddi.com/api/auth/forgot-password.php", {
+      const response = await axios.post("https://app.starkord.com/api/auth/forgot-password.php", {
         email
       }, {
         headers: {
@@ -178,7 +178,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   resetPassword: async (reset_token, new_password) => {
     try {
-      const response = await axios.post("https://stake.betpaddi.com/api/auth/reset-password.php", {
+      const response = await axios.post("https://app.starkord.com/api/auth/reset-password.php", {
         reset_token: reset_token,
         new_password : new_password
       }, {
@@ -230,7 +230,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         console.log("No auth token found")
         throw new Error('No auth token found');
       } 
-      const response = await axios.post("https://stake.betpaddi.com/api/auth/update-profile.php", {
+      const response = await axios.post("https://app.starkord.com/api/auth/update-profile.php", {
         token,
         name,
         country,
@@ -285,7 +285,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         console.log("No auth token found")
         throw new Error('No auth token found');
       } 
-      const response = await axios.post("https://stake.betpaddi.com/api/auth/update-profile.php", {
+      const response = await axios.post("https://app.starkord.com/api/auth/update-profile.php", {
         token,
         password
       }, {
@@ -345,7 +345,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw new Error('No auth token found');
       } 
 
-      const response = await axios.post("https://stake.betpaddi.com/api/auth/user-data.php", {
+      const response = await axios.post("https://app.starkord.com/api/auth/user-data.php", {
         token: token
       }, {
         headers: {

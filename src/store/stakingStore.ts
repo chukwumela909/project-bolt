@@ -69,7 +69,7 @@ const useStakingStore = create<StakingState>((set) => ({
         console.log("No auth token found")
         throw new Error('No auth token found');
       }
-      const response = await axios.post("https://stake.betpaddi.com/api/investment/list-stakes.php", {
+      const response = await axios.post("https://app.starkord.com/api/investment/list-stakes.php", {
         token: token
       }, {
         headers: {
@@ -107,7 +107,7 @@ const useStakingStore = create<StakingState>((set) => ({
         return false
       }
 
-      const response = await axios.post("https://stake.betpaddi.com/api/investment/stake.php", {
+      const response = await axios.post("https://app.starkord.com/api/investment/stake.php", {
         token: token,
         plan_id: plan
       }, {
@@ -153,7 +153,7 @@ const useStakingStore = create<StakingState>((set) => ({
         set({ restakeError: "No auth token found" })
         return false;
       }
-      const response = await axios.post("https://stake.betpaddi.com/api/investment/unstake.php", {
+      const response = await axios.post("https://app.starkord.com/api/investment/unstake.php", {
         token: token,
         stake_id: stake_id,
         wallet_address: wallet_address,
@@ -197,7 +197,7 @@ const useStakingStore = create<StakingState>((set) => ({
         return false;
       }
 
-      const response = await axios.post("https://stake.betpaddi.com/api/investment/restake.php", {
+      const response = await axios.post("https://app.starkord.com/api/investment/restake.php", {
         token: token,
         stake_id: stakeId,
       }, {
